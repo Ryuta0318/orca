@@ -67,12 +67,13 @@
     if (f && id !== "chat") return f.group;
     return "home";
   }
-  O.pageHead = function (id) {
+  O.pageHead = function (id, opt) {
+    opt = opt || {};
     var f = O.feature(id), s = SECTIONS[id] || {};
-    var title = f ? f.title : s.title, sub = f ? f.sub : s.sub;
+    var title = f ? f.title : s.title, sub = opt.sub || (f ? f.sub : s.sub);
     return '<div class="page-top"><button class="back" type="button" data-back>' + icon("back") + "<span>戻る</span></button></div>" +
       '<header class="page-head"><div class="page-title">' + (f ? '<span class="head-icon tone-' + f.tone + '">' + icon(f.icon) + "</span>" : "") +
-      "<div><h1>" + esc(title) + '</h1><p class="page-sub">' + esc(sub) + "</p></div></div></header>";
+      "<div><h1>" + esc(title) + '</h1><p class="page-sub">' + esc(sub) + "</p></div></div>" + (opt.actions ? '<div class="page-actions">' + opt.actions + "</div>" : "") + "</header>";
   };
   O.refreshBadges = function () {
     var n = O.openTodoCount();
@@ -151,7 +152,7 @@
   };
   V.chat = function () {
     return O.pageHead("chat") + '<div class="chat">' +
-      '<aside class="history" aria-label="チャット履歴"><button class="new-chat" type="button" data-new>' + icon("plus") + "新しいチャット</button>" +
+      '<aside class="history" aria-label="チャット履歴"><button class="new-chat" type="button" data-new-chat>' + icon("plus") + "新しいチャット</button>" +
       "<h2>最近</h2>" + HISTORY.map(function (h, i) { return '<a href="#chat"' + (i === 0 ? ' aria-current="true"' : "") + ">" + esc(h) + "</a>"; }).join("") + "</aside>" +
       '<section class="thread"><div class="messages" id="messages">' +
       '<div class="msg-user">先週のプロジェクト資料を要約して。</div>' +
@@ -202,9 +203,9 @@
   O.renderNotifs = function () { renderNotifs(); };
   function renderNotifs() {
     var todos = store.get("todos", []).filter(function (t) { return !t.done && new Date(t.due + "T00:00:00") <= O.TODAY; });
-    var night = store.get("night", []).filter(function (t) { return t.status === "done"; });
+    var night = store.get("night2", []).filter(function (t) { return t.status === "done"; }).slice(0, 3);
     var items = todos.map(function (t) { return '<a class="notif" href="#todo">' + icon("todo") + "<span><strong>期限のタスク</strong>" + esc(t.text) + "</span></a>"; })
-      .concat(night.map(function (t) { return '<a class="notif" href="#night">' + icon("moon") + "<span><strong>夜タスクが完了</strong>" + esc(t.text) + "</span></a>"; }));
+      .concat(night.map(function (t) { return '<a class="notif" href="#night">' + icon("moon") + "<span><strong>夜タスクが完了</strong>" + esc(t.title) + "</span></a>"; }));
     pop.innerHTML = '<p class="pop-head">お知らせ</p>' + (items.join("") || '<p class="empty">新しいお知らせはありません。</p>');
     document.getElementById("notifDot").hidden = !items.length;
   }
@@ -226,7 +227,8 @@
   var lastPage = "home";
   function render(id) {
     if (!V[id]) id = "home";
-    view.innerHTML = V[id]();
+    // A fresh root per render, so listeners a page attaches die with the page
+    view.innerHTML = '<div class="page-root">' + V[id]() + "</div>";
     view.setAttribute("data-page", id);
     var f = O.feature(id);
     var navId = id === "chat" ? "chat" : f ? f.group : id;
@@ -235,7 +237,7 @@
     });
     shell.classList.remove("open");
     document.getElementById("menuBtn").setAttribute("aria-expanded", "false");
-    if (O.AFTER[id]) O.AFTER[id](view);
+    if (O.AFTER[id]) O.AFTER[id](view.firstElementChild);
     view.querySelectorAll(".orbit").forEach(animateOrbit);
     lastPage = id;
     if (id === "search") { renderResults(""); document.getElementById("searchBox").focus(); }
@@ -270,15 +272,6 @@
   view.addEventListener("submit", function (e) {
     var form = e.target;
     if (form.hasAttribute("data-search")) { e.preventDefault(); return; }
-    if (form.id === "fbForm") {
-      e.preventDefault();
-      var fb = store.get("feedback", []);
-      fb.push({ at: new Date().toISOString(), text: form.querySelector("textarea").value.trim() });
-      store.set("feedback", fb);
-      form.reset();
-      O.toast("フィードバックを保存しました");
-      return;
-    }
     if (!form.hasAttribute("data-ask")) return;
     e.preventDefault();
     var input = form.querySelector("input");
@@ -321,19 +314,7 @@
       t.textContent = was ? "接続する" : "接続中";
       t.closest(".row").querySelector(".row-sub").textContent = was ? "未接続" : "接続済み";
       O.toast(name + (was ? " の接続を解除しました" : " を接続しました"));
-    } else if (t.hasAttribute("data-theme-set")) {
-      var v = t.getAttribute("data-theme-set");
-      store.set("theme", v);
-      applyTheme(v);
-      t.parentNode.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b === t)); });
-    } else if (t.hasAttribute("data-reset")) {
-      var keep = theme();
-      store.clear();
-      store.set("theme", keep);
-      O.refreshBadges();
-      renderNotifs();
-      O.toast("デモデータを初期状態に戻しました");
-    } else if (t.hasAttribute("data-new")) {
+    } else if (t.hasAttribute("data-new-chat")) {
       document.getElementById("messages").innerHTML = '<div class="note">新しいチャット。下の入力欄からどうぞ。</div>';
       document.getElementById("chatAsk").focus();
     }
