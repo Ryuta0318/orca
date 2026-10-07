@@ -107,7 +107,7 @@
   // Connector icons circle the mark on a tilted ellipse; nearer icons are larger and pass in front
   function animateOrbit(el) {
     var nodes = [].slice.call(el.querySelectorAll("[data-node]")), mark = el.querySelector(".orbit-mark");
-    var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var still = O.reduceMotion();
     var t0 = performance.now();
     function frame(now) {
       if (!el.isConnected) return;
@@ -158,6 +158,8 @@
     side.addEventListener("change", function () { setTimeout(label, 0); });
     label();
   }
+  var THINK_MS = 20000;                 // demo: how long "考えています" stays up
+  var THINK_STEPS = ["社内ナレッジを検索しています", "関連する資料を読み込んでいます", "回答の根拠を確認しています", "回答をまとめています"];
   function group(g) { return O.FEATURES.filter(function (f) { return f.group === g && f.id !== "chat"; }); }
 
   // ---------- Views ----------
@@ -318,15 +320,29 @@
     function post() {
       var m = document.getElementById("messages");
       m.insertAdjacentHTML("beforeend", '<div class="msg-user">' + esc(text) + "</div>" +
-        '<div class="thinking" role="status"><canvas class="orca-loader" aria-hidden="true"></canvas><span class="thinking-text">考えています<span class="dots"><i></i><i></i><i></i></span></span></div>');
-      var th = m.lastElementChild, loader = O.loader(th.querySelector("canvas"));
+        '<div class="thinking" role="status" aria-live="polite"><canvas class="orca-loader" aria-hidden="true"></canvas><div class="thinking-body">' +
+        '<span class="thinking-text">考えています<span class="dots"><i></i><i></i><i></i></span></span><span class="thinking-step" data-step>' + THINK_STEPS[0] + "</span>" +
+        '<div class="progress" aria-hidden="true"><i data-bar></i></div><span class="thinking-foot"><span data-sec>0</span> 秒<button class="link-btn" type="button" data-stop-thinking>止める</button></span></div></div>');
+      var th = m.lastElementChild, loader = O.loader(th.querySelector("canvas")), t0 = Date.now(), timer;
+      var step = th.querySelector("[data-step]"), bar = th.querySelector("[data-bar]"), sec = th.querySelector("[data-sec]");
       m.scrollTop = m.scrollHeight;
-      setTimeout(function () {
-        loader.stop();
+      th.scrollIntoView({ block: "nearest" });
+      function finish(msg) {
+        clearInterval(timer); loader.stop();
         if (!th.isConnected) return;
-        th.outerHTML = '<div class="note">デモ版のため回答は生成されません</div>';
+        th.outerHTML = '<div class="note">' + msg + "</div>";
         m.scrollTop = m.scrollHeight;
-      }, 4200);
+      }
+      th.__stop = function () { finish("回答を止めました"); };
+      timer = setInterval(function () {
+        if (!th.isConnected) { clearInterval(timer); loader.stop(); return; }
+        var el = Date.now() - t0;
+        if (el >= THINK_MS) return finish("デモ版のため回答は生成されません");
+        bar.style.width = (el / THINK_MS * 100).toFixed(1) + "%";
+        sec.textContent = Math.floor(el / 1000);
+        var s = THINK_STEPS[Math.min(THINK_STEPS.length - 1, Math.floor(el / (THINK_MS / THINK_STEPS.length)))];
+        if (step.textContent !== s) step.textContent = s;
+      }, 200);
     }
     if (view.getAttribute("data-page") !== "chat") {
       HISTORY.unshift(text.slice(0, 40));
@@ -351,6 +367,8 @@
       t.textContent = was ? "接続する" : "接続中";
       t.closest(".row").querySelector(".row-sub").textContent = was ? "未接続" : "接続済み";
       O.toast(name + (was ? " の接続を解除しました" : " を接続しました"));
+    } else if (t.hasAttribute("data-stop-thinking")) {
+      var thk = t.closest(".thinking"); if (thk && thk.__stop) thk.__stop();
     } else if (t.hasAttribute("data-new-chat")) {
       document.getElementById("messages").innerHTML = '<div class="note">新しいチャット。下の入力欄からどうぞ。</div>';
       document.getElementById("chatAsk").focus();

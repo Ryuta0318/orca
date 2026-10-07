@@ -171,7 +171,13 @@
     return '<svg class="spark" viewBox="0 0 ' + W + " " + H + '" aria-hidden="true"><path d="' + d + '"/></svg>';
   }
 
+  // "動きを減らす" is its own setting (default: animations on); it no longer depends on the OS flag
+  function reduceMotion() { return store.get("motion", "on") === "reduce"; }
+  function applyMotion() { document.documentElement.classList.toggle("reduce-motion", reduceMotion()); }
+  applyMotion();
+
   window.ORCA = {
+    reduceMotion: reduceMotion, applyMotion: applyMotion,
     icon: icon, esc: esc, store: store, rng: rng, hash: hash,
     TODAY: TODAY, addDays: addDays, md: md, mdw: mdw, iso: iso, yen: yen, pct: pct, WD: WD,
     PROPS: PROPS, COMPETITORS: COMPETITORS, CHANNELS: CHANNELS,

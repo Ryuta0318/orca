@@ -112,16 +112,20 @@
 
   O.loader = function (canvas) {
     var g = canvas.getContext("2d"), raf = 0, start = performance.now(), live = true;
-    var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var still = O.reduceMotion();
     function size() {
       var dpr = Math.min(2, window.devicePixelRatio || 1), r = canvas.getBoundingClientRect();
       canvas.width = Math.max(1, Math.round(r.width * dpr));
       canvas.height = Math.max(1, Math.round(r.height * dpr));
     }
+    function fit() {                      // follow the box if it is resized (phone rotation, window drag)
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      if (Math.abs(canvas.width - Math.round(canvas.clientWidth * dpr)) > 2) size();
+    }
     function frame(now) {
       if (!live) return;
       if (!canvas.isConnected) { live = false; return; }
-      if (canvas.width < 2) size();
+      if (canvas.width < 2) size(); else fit();
       var sc = Math.min(canvas.width / SW, canvas.height / SH);
       g.setTransform(1, 0, 0, 1, 0, 0);
       g.clearRect(0, 0, canvas.width, canvas.height);

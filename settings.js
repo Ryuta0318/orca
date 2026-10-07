@@ -96,6 +96,7 @@
         [["light", "ライト"], ["dark", "ダーク"], ["auto", "自動"]].map(function (k) { return '<button type="button" data-theme-set="' + k[0] + '" aria-pressed="' + (cur === k[0]) + '">' + k[1] + "</button>"; }).join("") + "</span></div>" +
         '<div class="set-row"><span><span class="row-title">回答の言語</span><span class="row-sub">チャットの回答に使う言語</span></span><label class="field inline"><select id="setLang">' +
         [["ja", "日本語"], ["en", "English"], ["zh", "中文"]].map(function (k) { return '<option value="' + k[0] + '"' + (lang === k[0] ? " selected" : "") + ">" + k[1] + "</option>"; }).join("") + "</select></label></div>" +
+        '<div class="set-row"><span><span class="row-title">動きを減らす</span><span class="row-sub">シャチのローディングやコネクタの回転を止め、静止画で表示する</span></span>' + toggle(store.get("motion", "on") === "reduce", "data-motion", "動きを減らす") + "</div>" +
         '<div class="set-row"><span><span class="row-title">TODO のリマインド</span><span class="row-sub">期限の日の朝にお知らせする</span></span>' + toggle(n.todo, 'data-notify="todo"', "TODO のリマインド") + "</div>" +
         '<div class="set-row"><span><span class="row-title">夜タスクの完了通知</span><span class="row-sub">結果が出たらお知らせする</span></span>' + toggle(n.night, 'data-notify="night"', "夜タスクの完了通知") + "</div>" +
         '<div class="set-row"><span><span class="row-title">デモデータをリセット</span><span class="row-sub">TODO・夜タスク・台帳・メモリ・ノートを初期状態に戻す</span></span><button class="chip" type="button" data-reset>リセット</button></div>' +
@@ -224,6 +225,11 @@
       var s = store.get("skills", {}), id = t.getAttribute("data-skill");
       s[id] = !skillOn(id); store.set("skills", s);
       t.setAttribute("aria-checked", String(s[id]));
+    } else if (t.hasAttribute("data-motion")) {
+      var red = store.get("motion", "on") !== "reduce";
+      store.set("motion", red ? "reduce" : "on"); O.applyMotion();
+      t.setAttribute("aria-checked", String(red));
+      O.toast(red ? "動きを減らしました" : "動きをもとに戻しました");
     } else if (t.hasAttribute("data-notify")) {
       var n = store.get("notify", { todo: true, night: true }), k = t.getAttribute("data-notify");
       n[k] = !n[k]; store.set("notify", n);
