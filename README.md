@@ -21,7 +21,7 @@ python3 -m http.server 8000
 | `#agents` | 既存サービス（競合調査、レートパリティ等）をカテゴリで絞り込み |
 | `#library` | マニュアル・RM台帳・BC画像などのナレッジ |
 | `#integrations` | 外部サービス連携（接続トグル） |
-| `#settings` | テーマ切替（ライト / ダーク / 自動） |
+| `#settings` | テーマ切替（既定はライト。ダーク / 自動も選べる） |
 | `#welcome` | サインイン前の画面 |
 
 幅 860px 以下ではサイドバーがドロワーになる。
@@ -30,4 +30,5 @@ python3 -m http.server 8000
 
 - `assets/orca-wordmark.svg` — 支給ワードマークをベクターで描き直したもの（`currentColor` で着色、CSS ではマスクとして使用）
 - `assets/orca-mark.webp` / `orca-mark.png` — 支給マーク（4096px PNG）を余白トリムして縮小
+- `assets/orca-orb-soft.webp` — ヒーロー背景用にマークの暗部を淡いブルーへ寄せた版
 - `assets/orca-mark-{32,64,180}.png` — favicon / apple-touch-icon
