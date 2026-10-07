@@ -77,6 +77,15 @@
   color-scheme: dark;
 }
 
+/* ---------- Dark-mode accents (Settings > theme): seven = seven x seven yellow, fav = fav pink. Used sparingly:
+   only the accent token changes, so links, active states, switches, lines and the primary button follow it. ---------- */
+:root[data-theme="dark"][data-accent="seven"] { --accent: #e8e64e; --accent-2: #f3f18a; --accent-soft: rgba(232, 230, 78, .14); --on-accent: #14130a; --c-ty: #e8e64e; }
+:root[data-theme="dark"][data-accent="fav"] { --accent: #e4608f; --accent-2: #f08fb1; --accent-soft: rgba(228, 96, 143, .16); --on-accent: #1a0a10; --c-ty: #e4608f; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="fhg"])[data-accent="seven"] { --accent: #e8e64e; --accent-2: #f3f18a; --accent-soft: rgba(232, 230, 78, .14); --on-accent: #14130a; --c-ty: #e8e64e; }
+  :root:not([data-theme="light"]):not([data-theme="fhg"])[data-accent="fav"] { --accent: #e4608f; --accent-2: #f08fb1; --accent-soft: rgba(228, 96, 143, .16); --on-accent: #1a0a10; --c-ty: #e4608f; }
+}
+
 /* ---------- FHG mode: black base, FHG vermilion (#dd5234) as the accent used throughout ---------- */
 :root[data-theme="fhg"] {
   --page: #000000; --frame-1: #060606; --frame-2: #000000; --frame-3: #0d0d0d; --frame-edge: rgba(221, 82, 52, .28);
@@ -1016,6 +1025,10 @@ td.bad-cell { background: var(--bad-soft); color: var(--bad); font-weight: 700; 
 .slot select { width: 100%; min-height: 38px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--hair); background: var(--frame-1); font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink); }
 .link-btn { margin-top: 8px; border: 0; background: transparent; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; padding: 4px 0; }
 .set-row.is-off { opacity: .45; }
+.swatches { display: inline-flex; flex-wrap: wrap; gap: 8px; }
+.swatch { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 14px 0 10px; border-radius: 999px; border: 1px solid var(--hair); background: var(--row); cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.swatch i { width: 16px; height: 16px; border-radius: 50%; background: var(--sw); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
+.swatch[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
 .fac-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px 18px; }
 .fac-group p { margin: 0 0 4px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
 .fac-opt { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 14px; cursor: pointer; }

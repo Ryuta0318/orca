@@ -176,7 +176,14 @@
   function applyMotion() { document.documentElement.classList.toggle("reduce-motion", reduceMotion()); }
   applyMotion();
 
+  // Dark-mode accent: "default" (blue) | "seven" (seven x seven yellow) | "fav" (fav pink); only dark mode reads it
+  var ACCENTS = [["default", "ブルー（標準）", "#6aa5ff"], ["seven", "seven", "#e8e64e"], ["fav", "fav", "#c4386a"]];
+  function accent() { var a = store.get("accent", "default"); return ACCENTS.some(function (x) { return x[0] === a; }) ? a : "default"; }
+  function applyAccent() { var a = accent(); if (a === "default") document.documentElement.removeAttribute("data-accent"); else document.documentElement.setAttribute("data-accent", a); }
+  applyAccent();
+
   window.ORCA = {
+    ACCENTS: ACCENTS, accent: accent, applyAccent: applyAccent,
     reduceMotion: reduceMotion, applyMotion: applyMotion,
     icon: icon, esc: esc, store: store, rng: rng, hash: hash,
     TODAY: TODAY, addDays: addDays, md: md, mdw: mdw, iso: iso, yen: yen, pct: pct, WD: WD,

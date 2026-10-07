@@ -96,6 +96,8 @@
         [["light", "ライト"], ["dark", "ダーク"], ["fhg", "FHG"], ["auto", "自動"]].map(function (k) { return '<button type="button" data-theme-set="' + k[0] + '" aria-pressed="' + (cur === k[0]) + '">' + k[1] + "</button>"; }).join("") + "</span></div>" +
         '<div class="set-row"><span><span class="row-title">回答の言語</span><span class="row-sub">チャットの回答に使う言語</span></span><label class="field inline"><select id="setLang">' +
         [["ja", "日本語"], ["en", "English"], ["zh", "中文"]].map(function (k) { return '<option value="' + k[0] + '"' + (lang === k[0] ? " selected" : "") + ">" + k[1] + "</option>"; }).join("") + "</select></label></div>" +
+        '<div class="set-row' + (cur === "light" || cur === "fhg" ? " is-off" : "") + '"><span><span class="row-title">ダークモードの差し色</span><span class="row-sub">ダークで使う色。seven は seven x seven、fav は fav のブランドカラー。ライト・FHG では使われません</span></span><span class="swatches" role="group" aria-label="ダークモードの差し色">' +
+        O.ACCENTS.map(function (a) { return '<button class="swatch" type="button" data-accent-set="' + a[0] + '" aria-pressed="' + (O.accent() === a[0]) + '" style="--sw:' + a[2] + '"><i></i>' + a[1] + "</button>"; }).join("") + "</span></div>" +
         '<div class="set-row"><span><span class="row-title">動きを減らす</span><span class="row-sub">シャチのローディングやコネクタの回転を止め、静止画で表示する</span></span>' + toggle(store.get("motion", "on") === "reduce", "data-motion", "動きを減らす") + "</div>" +
         '<div class="set-row"><span><span class="row-title">TODO のリマインド</span><span class="row-sub">期限の日の朝にお知らせする</span></span>' + toggle(n.todo, 'data-notify="todo"', "TODO のリマインド") + "</div>" +
         '<div class="set-row"><span><span class="row-title">夜タスクの完了通知</span><span class="row-sub">結果が出たらお知らせする</span></span>' + toggle(n.night, 'data-notify="night"', "夜タスクの完了通知") + "</div>" +
@@ -221,10 +223,16 @@
       store.set("theme", v);
       O.applyTheme(v);
       t.parentNode.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b === t)); });
+      var sw = dlg.querySelector(".swatches");
+      if (sw) sw.closest(".set-row").classList.toggle("is-off", v === "light" || v === "fhg");
     } else if (t.hasAttribute("data-skill")) {
       var s = store.get("skills", {}), id = t.getAttribute("data-skill");
       s[id] = !skillOn(id); store.set("skills", s);
       t.setAttribute("aria-checked", String(s[id]));
+    } else if (t.hasAttribute("data-accent-set")) {
+      store.set("accent", t.getAttribute("data-accent-set")); O.applyAccent();
+      t.parentNode.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b === t)); });
+      O.toast("ダークモードの差し色を変更しました");
     } else if (t.hasAttribute("data-motion")) {
       var red = store.get("motion", "on") !== "reduce";
       store.set("motion", red ? "reduce" : "on"); O.applyMotion();
