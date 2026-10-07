@@ -246,6 +246,7 @@
     document.getElementById("menuBtn").setAttribute("aria-expanded", "false");
     if (O.AFTER[id]) O.AFTER[id](view.firstElementChild);
     view.querySelectorAll(".orbit").forEach(animateOrbit);
+    if (id === "home") O.mountOnhand(view.firstElementChild);
     lastPage = id;
     if (id === "search") { renderResults(""); document.getElementById("searchBox").focus(); }
     if (id === "chat") { var m = document.getElementById("messages"); m.scrollTop = m.scrollHeight; }

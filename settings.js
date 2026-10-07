@@ -79,10 +79,9 @@
           return '<label class="slot"><span class="slot-no">' + (i + 1) + '</span><span class="tile-icon tone-' + c.tone + '">' + ic(c.icon) + '</span><select data-slot="' + i + '" aria-label="' + (i + 1) + '番目">' +
             choices.map(function (x) { return '<option value="' + x.id + '"' + (x.id === id ? " selected" : "") + ">" + esc(x.title) + "</option>"; }).join("") + "</select></label>";
         }).join("") + '</div><button class="link-btn" type="button" data-tiles-reset>初期設定（Chat・Agents・Library・Integrations）に戻す</button>' +
-        '<h4 class="set-h">オンハンド <span class="muted">選んだ施設の予約済み室夜を、ホームにグラフで表示します</span></h4><div class="set-list">' +
+        '<h4 class="set-h">オンハンド <span class="muted">選んだ施設の ADR・OCC・RevPAR を、予算・前年と並べてホームに表示します。複数選ぶとホームで切り替えられます</span></h4><div class="set-list">' +
         '<div class="set-row"><span><span class="row-title">ホームにオンハンドを表示</span><span class="row-sub">オフのときは表示しません</span></span>' + toggle(oh.on, "data-oh-on", "ホームにオンハンドを表示") + "</div>" +
-        '<div class="set-row' + (oh.on ? "" : " is-off") + '"><span><span class="row-title">表示する期間</span><span class="row-sub">今月から数えた月数</span></span>' + seg("data-oh-months", oh.months, [[6, "6か月"], [12, "12か月"]]) + "</div>" +
-        '<div class="set-row' + (oh.on ? "" : " is-off") + '"><span><span class="row-title">内訳</span><span class="row-sub">積み上げ棒と円グラフの色分け</span></span>' + seg("data-oh-axis", oh.axis, [["channel", "チャネル区分"], ["site", "予約サイト"]]) + "</div>" +
+        '<div class="set-row' + (oh.on ? "" : " is-off") + '"><span><span class="row-title">最初に開く指標</span><span class="row-sub">ホームを開いたときに選ばれているタブ</span></span>' + seg("data-oh-metric", oh.metric, [["adr", "ADR"], ["occ", "OCC"], ["revpar", "RevPAR"]]) + "</div>" +
         '<div class="set-row col' + (oh.on ? "" : " is-off") + '"><span class="row-title">施設 <span class="muted">' + oh.facs.length + " / " + facs.length + ' 施設を選択中</span></span><div class="fac-pick">' +
         (O.FAC_BRANDS || []).map(function (b) {
           return '<div class="fac-group"><p>' + b + "</p>" + facs.filter(function (f) { return f.brand === b; }).map(function (f) {
@@ -207,12 +206,11 @@
   function saveOh(fn) { var c = O.onhandConfig(); fn(c); store.set("onhand", c); show("home"); O.refreshHome(); }
   function onClick(e) {
     if (e.target === dlg || e.target.closest("[data-close-dlg]")) { close(); return; }
-    var hb = e.target.closest("[data-oh-on],[data-oh-months],[data-oh-axis],[data-tiles-reset]");
+    var hb = e.target.closest("[data-oh-on],[data-oh-metric],[data-tiles-reset]");
     if (hb) {
       if (hb.hasAttribute("data-tiles-reset")) { store.set("homeTiles", ["chat", "agents", "library", "integrations"]); show("home"); O.refreshHome(); return O.toast("クイックアクセスを初期設定に戻しました"); }
       if (hb.hasAttribute("data-oh-on")) return saveOh(function (c) { c.on = !c.on; });
-      if (hb.hasAttribute("data-oh-months")) return saveOh(function (c) { c.months = +hb.getAttribute("data-oh-months"); });
-      if (hb.hasAttribute("data-oh-axis")) return saveOh(function (c) { c.axis = hb.getAttribute("data-oh-axis"); });
+      if (hb.hasAttribute("data-oh-metric")) return saveOh(function (c) { c.metric = hb.getAttribute("data-oh-metric"); });
     }
     var t = e.target.closest("button");
     if (!t) return;
