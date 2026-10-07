@@ -7,6 +7,7 @@
   var TABS = [
     { id: "personal", label: "個人設定", icon: "sliders" },
     { id: "home", label: "ホーム", icon: "home" },
+    { id: "color", label: "カラー", icon: "palette" },
     { id: "skills", label: "スキル", icon: "skills" },
     { id: "memory", label: "メモリ", icon: "memory" },
     { id: "notes", label: "自分のノート", icon: "note" },
@@ -15,6 +16,7 @@
   ];
   // Extra icons used only here
   var EXTRA = {
+    palette: '<circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1.2"/><circle cx="12" cy="7.5" r="1.2"/><circle cx="16" cy="10" r="1.2"/><path d="M12 21c-1.5 0-2-1-2-2 0-2 3-2 3-4a2 2 0 0 0-2-2h-4"/>',
     sliders: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
     skills: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/>',
     memory: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M3.5 9h3M17.5 15h3"/>',
@@ -69,6 +71,22 @@
     return '<span class="seg" role="group">' + opts.map(function (o) { return '<button type="button" ' + attr + '="' + o[0] + '" aria-pressed="' + (String(cur) === String(o[0])) + '">' + o[1] + "</button>"; }).join("") + "</span>";
   }
   var PANELS = {
+    color: function () {
+      var C = O.color, c = C.config(), key = C.themeKey();
+      var sw = C.PRESETS.map(function (p) {
+        return '<button class="swatch" type="button" data-color-preset="' + p.id + '" aria-pressed="' + (c.preset === p.id) + '" style="--sw:' + (p.hex || C.DEFAULT_ACCENT[key]) + '"><i></i>' + p.name + '<small class="muted">' + p.note + "</small></button>";
+      }).join("") + '<button class="swatch" type="button" data-color-preset="custom" aria-pressed="' + (c.preset === "custom") + '" style="--sw:' + c.custom + '"><i></i>自分で選ぶ</button>';
+      return '<h3>カラー</h3><p class="dlg-lead">差し色（ボタン・選択中の項目・グラフの線・アイコンなど）を、好きな色に変えられます。ライト・ダーク・FHG のどれでも使えます。</p>' +
+        '<h4 class="set-h">差し色</h4><div class="swatches" role="group" aria-label="差し色のプリセット">' + sw + "</div>" +
+        '<div class="cp-row"><input class="cp-pick" id="colPick" type="color" value="' + c.custom + '" aria-label="色を選ぶ"><input class="cp-hex" id="colHex" value="' + c.custom + '" maxlength="7" spellcheck="false" aria-label="色コード（例: #7a5cff）"><span class="hint" style="margin:0">色を選ぶか、色コードを入れると、すぐ反映されます</span></div>' +
+        '<p class="cp-info" id="colInfo" aria-live="polite"></p>' +
+        '<div class="set-list"><div class="set-row col"><span><span class="row-title">背景の色味</span><span class="row-sub wrap">差し色を背景にうっすら混ぜます。0 で混ぜません</span></span><span class="cp-row" style="padding:0"><input class="cp-range" id="colTint" type="range" min="0" max="100" step="1" value="' + c.tint + '" aria-label="背景の色味"><output class="cp-out" id="colTintOut">' + c.tint + "</output></span></div>" +
+        '<div class="set-row"><span><span class="row-title">読みやすさのために自動調整する</span><span class="row-sub wrap">背景と見分けにくい色（ライトでの黄色など）を、明るさだけ調整します。切ると選んだ色そのままになります</span></span>' + toggle(!c.exact, "data-color-auto", "読みやすさのために自動調整する") + "</div>" +
+        '<div class="set-row"><span><span class="row-title">色をもとに戻す</span><span class="row-sub wrap">差し色を標準に、背景の色味を 0 にします</span></span><button class="chip" type="button" data-color-reset>戻す</button></div></div>' +
+        '<h4 class="set-h">プレビュー <span class="muted">いま開いているテーマでの見え方</span></h4>' +
+        '<div class="cprev"><div class="cprev-row"><button class="btn btn-primary" type="button" tabindex="-1">主要ボタン</button><a class="see-all" href="javascript:void(0)" tabindex="-1" style="font-size:14px">リンクの色</a><span class="pill info">ラベル</span><span class="chip" aria-pressed="true" tabindex="-1">選択中</span><span class="chip" tabindex="-1">未選択</span><span class="switch" role="img" aria-label="オンのスイッチ" aria-checked="true" style="pointer-events:none"><span></span></span></div>' +
+        '<div class="cprev-row"><div class="progress"><i></i></div><span class="cprev-bars" aria-hidden="true"><i style="height:30%"></i><i style="height:55%"></i><i style="height:42%"></i><i style="height:78%"></i><i style="height:60%"></i><i style="height:92%"></i></span></div></div>';
+    },
     home: function () {
       var tiles = O.homeTiles(), choices = O.TILE_CHOICES(), oh = O.onhandConfig();
       var facs = O.FACILITIES || [];
@@ -96,8 +114,6 @@
         [["light", "ライト"], ["dark", "ダーク"], ["fhg", "FHG"], ["auto", "自動"]].map(function (k) { return '<button type="button" data-theme-set="' + k[0] + '" aria-pressed="' + (cur === k[0]) + '">' + k[1] + "</button>"; }).join("") + "</span></div>" +
         '<div class="set-row"><span><span class="row-title">回答の言語</span><span class="row-sub">チャットの回答に使う言語</span></span><label class="field inline"><select id="setLang">' +
         [["ja", "日本語"], ["en", "English"], ["zh", "中文"]].map(function (k) { return '<option value="' + k[0] + '"' + (lang === k[0] ? " selected" : "") + ">" + k[1] + "</option>"; }).join("") + "</select></label></div>" +
-        '<div class="set-row' + (cur === "light" || cur === "fhg" ? " is-off" : "") + '"><span><span class="row-title">ダークモードの差し色</span><span class="row-sub">ダークで使う色。seven は seven x seven、fav は fav のブランドカラー。ライト・FHG では使われません</span></span><span class="swatches" role="group" aria-label="ダークモードの差し色">' +
-        O.ACCENTS.map(function (a) { return '<button class="swatch" type="button" data-accent-set="' + a[0] + '" aria-pressed="' + (O.accent() === a[0]) + '" style="--sw:' + a[2] + '"><i></i>' + a[1] + "</button>"; }).join("") + "</span></div>" +
         '<div class="set-row"><span><span class="row-title">動きを減らす</span><span class="row-sub">シャチのローディングやコネクタの回転を止め、静止画で表示する</span></span>' + toggle(store.get("motion", "on") === "reduce", "data-motion", "動きを減らす") + "</div>" +
         '<div class="set-row"><span><span class="row-title">TODO のリマインド</span><span class="row-sub">期限の日の朝にお知らせする</span></span>' + toggle(n.todo, 'data-notify="todo"', "TODO のリマインド") + "</div>" +
         '<div class="set-row"><span><span class="row-title">夜タスクの完了通知</span><span class="row-sub">結果が出たらお知らせする</span></span>' + toggle(n.night, 'data-notify="night"', "夜タスクの完了通知") + "</div>" +
@@ -166,6 +182,15 @@
     document.body.appendChild(dlg);
     dlg.addEventListener("click", onClick);
     dlg.addEventListener("submit", onSubmit);
+    dlg.addEventListener("input", function (e) {
+      var t = e.target;
+      if (t.id === "colPick") { dlg.querySelector("#colHex").value = t.value; dlg.querySelector("#colHex").classList.remove("bad"); setColor(function (c) { c.preset = "custom"; c.custom = t.value; }); }
+      else if (t.id === "colHex") {
+        var rgb = O.color.parse(t.value);
+        t.classList.toggle("bad", !rgb);
+        if (rgb) { var hx = O.color.toHex(rgb); dlg.querySelector("#colPick").value = hx; setColor(function (c) { c.preset = "custom"; c.custom = hx; }); }
+      } else if (t.id === "colTint") setColor(function (c) { c.tint = +t.value; });
+    });
     dlg.addEventListener("change", function (e) {
       var t = e.target;
       if (t.id === "setLang") { store.set("lang", t.value); O.toast("回答の言語を変更しました"); }
@@ -185,6 +210,7 @@
     dlg.querySelectorAll("[data-tab]").forEach(function (b) { b.setAttribute("aria-selected", String(b.getAttribute("data-tab") === tab)); });
     dlg.querySelector("#dlgBody").innerHTML = PANELS[tab]();
     dlg.querySelector("#dlgBody").scrollTop = 0;
+    if (tab === "color") refreshColor();
     var foot = dlg.querySelector("#dlgFoot");
     foot.hidden = tab !== "scope";
     foot.textContent = "検索範囲はこの画面では変更できません。「対象外」は、権限の範囲外の検索先です。";
@@ -206,9 +232,34 @@
   }
   O.closeSettings = close;
 
+  // Colour tab: update everything in place so the picker keeps focus while the user drags
+  function refreshColor() {
+    var C = O.color, c = C.config(), r = C.resolve(c), info = dlg.querySelector("#colInfo");
+    if (!info) return;
+    if (r.isDefault) info.innerHTML = "テーマ標準の色を使っています（ライトは青、ダークは明るい青、FHG はオレンジ）。";
+    else {
+      info.innerHTML = "適用される色 <b>" + r.hex.toUpperCase() + "</b>　背景との明るさの差 " + r.ratio.toFixed(1) + " : 1" +
+        (r.adjusted ? "　読みやすさのため明るさを調整しました（選んだ色 <b>" + r.base.toUpperCase() + "</b>）" : "") +
+        (c.exact && r.ratio < 4.5 ? '　<span class="warn">この色は背景と見分けにくく、小さな文字が読みにくくなります</span>' : "");
+    }
+    dlg.querySelectorAll("[data-color-preset]").forEach(function (b) {
+      var id = b.getAttribute("data-color-preset"); b.setAttribute("aria-pressed", String(c.preset === id));
+      if (id === "custom") b.style.setProperty("--sw", c.custom);
+      if (id === "default") b.style.setProperty("--sw", C.DEFAULT_ACCENT[C.themeKey()]);
+    });
+    var out = dlg.querySelector("#colTintOut"); if (out) out.textContent = c.tint;
+  }
+  function setColor(fn) { var c = O.color.config(); fn(c); O.color.save(c); O.color.apply(); refreshColor(); }
   function saveOh(fn) { var c = O.onhandConfig(); fn(c); store.set("onhand", c); show("home"); O.refreshHome(); }
   function onClick(e) {
     if (e.target === dlg || e.target.closest("[data-close-dlg]")) { close(); return; }
+    var cb = e.target.closest("[data-color-preset],[data-color-auto],[data-color-reset]");
+    if (cb) {
+      if (cb.hasAttribute("data-color-preset")) setColor(function (c) { c.preset = cb.getAttribute("data-color-preset"); });
+      else if (cb.hasAttribute("data-color-auto")) { setColor(function (c) { c.exact = !c.exact; }); cb.setAttribute("aria-checked", String(!O.color.config().exact)); }
+      else { setColor(function (c) { c.preset = "default"; c.tint = 0; c.exact = false; }); show("color"); O.toast("色をもとに戻しました"); }
+      return;
+    }
     var hb = e.target.closest("[data-oh-on],[data-oh-metric],[data-tiles-reset]");
     if (hb) {
       if (hb.hasAttribute("data-tiles-reset")) { store.set("homeTiles", ["chat", "agents", "library", "integrations"]); show("home"); O.refreshHome(); return O.toast("クイックアクセスを初期設定に戻しました"); }
@@ -223,16 +274,10 @@
       store.set("theme", v);
       O.applyTheme(v);
       t.parentNode.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b === t)); });
-      var sw = dlg.querySelector(".swatches");
-      if (sw) sw.closest(".set-row").classList.toggle("is-off", v === "light" || v === "fhg");
     } else if (t.hasAttribute("data-skill")) {
       var s = store.get("skills", {}), id = t.getAttribute("data-skill");
       s[id] = !skillOn(id); store.set("skills", s);
       t.setAttribute("aria-checked", String(s[id]));
-    } else if (t.hasAttribute("data-accent-set")) {
-      store.set("accent", t.getAttribute("data-accent-set")); O.applyAccent();
-      t.parentNode.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b === t)); });
-      O.toast("ダークモードの差し色を変更しました");
     } else if (t.hasAttribute("data-motion")) {
       var red = store.get("motion", "on") !== "reduce";
       store.set("motion", red ? "reduce" : "on"); O.applyMotion();

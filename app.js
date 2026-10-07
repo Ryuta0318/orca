@@ -228,6 +228,7 @@
   function applyTheme(t) {
     if (t === "auto") document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", t);   // light | dark | fhg
+    if (O.applyColor) O.applyColor();                                // accent contrast depends on the theme
   }
   applyTheme(theme());
 

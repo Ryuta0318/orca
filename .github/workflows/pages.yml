@@ -25,7 +25,7 @@ jobs:
       - name: Collect site files
         run: |
           mkdir _site
-          cp -r index.html styles.css core.js features.js tools.js tools2.js onhand.js loader.js settings.js app.js assets _site/
+          cp -r index.html styles.css core.js color.js features.js tools.js tools2.js onhand.js loader.js settings.js app.js assets _site/
           # Cache-bust: browsers keep Pages files for ~10 min, so tag our JS/CSS with the commit
           sed -i -E "s#(src|href)=\"([a-z0-9]+)\.(js|css)\"#\1=\"\2.\3?v=${GITHUB_SHA::7}\"#g" _site/index.html
           grep -o '[a-z0-9]*\.\(js\|css\)?v=[0-9a-f]*' _site/index.html

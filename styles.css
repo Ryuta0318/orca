@@ -77,35 +77,26 @@
   color-scheme: dark;
 }
 
-/* ---------- Dark-mode accents (Settings > theme): seven = seven x seven yellow, fav = fav pink. Used sparingly:
-   only the accent token changes, so links, active states, switches, lines and the primary button follow it. ---------- */
-:root[data-theme="dark"][data-accent="seven"] { --accent: #e8e64e; --accent-2: #f3f18a; --accent-soft: rgba(232, 230, 78, .14); --on-accent: #14130a; --c-ty: #e8e64e; }
-:root[data-theme="dark"][data-accent="fav"] { --accent: #e4608f; --accent-2: #f08fb1; --accent-soft: rgba(228, 96, 143, .16); --on-accent: #1a0a10; --c-ty: #e4608f; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]):not([data-theme="fhg"])[data-accent="seven"] { --accent: #e8e64e; --accent-2: #f3f18a; --accent-soft: rgba(232, 230, 78, .14); --on-accent: #14130a; --c-ty: #e8e64e; }
-  :root:not([data-theme="light"]):not([data-theme="fhg"])[data-accent="fav"] { --accent: #e4608f; --accent-2: #f08fb1; --accent-soft: rgba(228, 96, 143, .16); --on-accent: #1a0a10; --c-ty: #e4608f; }
-}
-
 /* ---------- FHG mode: black base, FHG vermilion (#dd5234) as the accent used throughout ---------- */
 :root[data-theme="fhg"] {
-  --page: #000000; --frame-1: #060606; --frame-2: #000000; --frame-3: #0d0d0d; --frame-edge: rgba(221, 82, 52, .28);
+  --page: #000000; --frame-1: #060606; --frame-2: #000000; --frame-3: #0d0d0d; --frame-edge: color-mix(in srgb, var(--accent) 28%, transparent);
   --sidebar: rgba(255, 255, 255, .025); --glass: rgba(255, 255, 255, .05); --card: rgba(255, 255, 255, .045); --row: #121212; --sunk: #1b1b1b;
   --ink: #ffffff; --ink-2: #dcdcdc; --muted: #9b9993; --hair: rgba(255, 255, 255, .11);
-  --accent: #dd5234; --accent-2: #f2785b; --accent-soft: rgba(221, 82, 52, .17); --on-accent: #0a0a0a;
-  --violet: #dd5234; --violet-soft: rgba(221, 82, 52, .17); --mint: #dd5234; --mint-soft: rgba(221, 82, 52, .17);
-  --coral: #f2b45a; --coral-soft: rgba(242, 180, 90, .15); --rose: #dd5234; --rose-soft: rgba(221, 82, 52, .17);
+  --accent: #dd5234; --accent-2: #f2785b; --accent-soft: color-mix(in srgb, var(--accent) 17%, transparent); --on-accent: #0a0a0a;
+  --violet: #dd5234; --violet-soft: color-mix(in srgb, var(--accent) 17%, transparent); --mint: #dd5234; --mint-soft: color-mix(in srgb, var(--accent) 17%, transparent);
+  --coral: #f2b45a; --coral-soft: rgba(242, 180, 90, .15); --rose: #dd5234; --rose-soft: color-mix(in srgb, var(--accent) 17%, transparent);
   --good: #5fd1a0; --good-soft: rgba(95, 209, 160, .14); --bad: #ff8a80; --bad-soft: rgba(255, 138, 128, .15); --warn: #f2c46a; --warn-soft: rgba(242, 196, 106, .14);
-  --c-ty: #dd5234; --c-ly: #8f8d87; --c-bud: #ffffff; --star: #f2c46a;
+  --c-ty: var(--accent); --c-ly: #8f8d87; --c-bud: #ffffff; --star: #f2c46a;
   --night: #000000; --night-2: #1d0e0a; --on-night: #ffffff;
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 30px -14px rgba(0, 0, 0, .9);
-  --shadow-frame: 0 40px 90px -40px rgba(221, 82, 52, .4), 0 2px 6px rgba(0, 0, 0, .5);
+  --shadow-frame: 0 40px 90px -40px color-mix(in srgb, var(--accent) 40%, transparent), 0 2px 6px rgba(0, 0, 0, .5);
   --font-head: "Oswald", "Noto Sans JP", "Hiragino Sans", sans-serif;
   color-scheme: dark;
 }
-:root[data-theme="fhg"] body { background: radial-gradient(52rem 34rem at 96% -6%, rgba(221, 82, 52, .2), transparent 62%), radial-gradient(40rem 28rem at -6% 110%, rgba(221, 82, 52, .1), transparent 60%), #000; background-attachment: fixed; }
-:root[data-theme="fhg"] .shell { background: radial-gradient(60% 50% at 96% 0%, rgba(221, 82, 52, .12), transparent 62%), #000; border-color: rgba(221, 82, 52, .45); }
-:root[data-theme="fhg"] .sidebar { border-right-color: rgba(221, 82, 52, .28); }
-:root[data-theme="fhg"] .welcome { background: radial-gradient(46rem 28rem at 50% 12%, rgba(221, 82, 52, .3), transparent 65%), #000; }
+:root[data-theme="fhg"] body { background: radial-gradient(52rem 34rem at 96% -6%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 62%), radial-gradient(40rem 28rem at -6% 110%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%), #000; background-attachment: fixed; }
+:root[data-theme="fhg"] .shell { background: radial-gradient(60% 50% at 96% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 62%), #000; border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+:root[data-theme="fhg"] .sidebar { border-right-color: color-mix(in srgb, var(--accent) 28%, transparent); }
+:root[data-theme="fhg"] .welcome { background: radial-gradient(46rem 28rem at 50% 12%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 65%), #000; }
 
 /* Headlines: condensed, bold, upper-case Latin — like the FHG network graphic */
 :root[data-theme="fhg"] .page-head h1, :root[data-theme="fhg"] .hero h1, :root[data-theme="fhg"] .doc-head h2, :root[data-theme="fhg"] .welcome-tag, :root[data-theme="fhg"] .dlg-head h2 {
@@ -131,7 +122,7 @@
 :root[data-theme="fhg"] .ohx-table td.bad { color: var(--bad); }
 :root[data-theme="fhg"] .ohx-table tbody th { color: var(--ink); }
 :root[data-theme="fhg"] .ohx-title, :root[data-theme="fhg"] .oh-eyebrow { color: var(--accent); }
-:root[data-theme="fhg"] .ohx-table-wrap { background: rgba(221, 82, 52, .1); }
+:root[data-theme="fhg"] .ohx-table-wrap { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 :root[data-theme="fhg"] .donut-num, :root[data-theme="fhg"] .oh-donut-num { fill: var(--accent); }
 :root[data-theme="fhg"] .badge { color: var(--on-accent); }
 :root[data-theme="fhg"] .see-all, :root[data-theme="fhg"] .link-btn, :root[data-theme="fhg"] .crumbs button, :root[data-theme="fhg"] .link-back { color: var(--accent); }
@@ -153,14 +144,14 @@
 :root[data-theme="fhg"] .btn-ghost { border-color: var(--accent); color: var(--accent); }
 :root[data-theme="fhg"] .avatar { background: var(--accent); color: var(--on-accent); }
 :root[data-theme="fhg"] .avatar.soft { background: var(--accent); color: var(--on-accent); }
-:root[data-theme="fhg"] .back { border-color: rgba(221, 82, 52, .55); }
+:root[data-theme="fhg"] .back { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
 :root[data-theme="fhg"] .back:hover { background: var(--accent); color: var(--on-accent); }
 :root[data-theme="fhg"] .back:hover .i { color: var(--on-accent); }
 
 /* Every icon tile is vermilion; borders and hovers pick it up too */
 :root[data-theme="fhg"] .tone-blue, :root[data-theme="fhg"] .tone-violet, :root[data-theme="fhg"] .tone-mint, :root[data-theme="fhg"] .tone-rose, :root[data-theme="fhg"] .tone-coral,
 :root[data-theme="fhg"] .tile-icon, :root[data-theme="fhg"] .row-icon, :root[data-theme="fhg"] .head-icon { color: var(--accent); background: var(--accent-soft); }
-:root[data-theme="fhg"] .tile, :root[data-theme="fhg"] .card-link, :root[data-theme="fhg"] .panel, :root[data-theme="fhg"] .card, :root[data-theme="fhg"] .kpi, :root[data-theme="fhg"] .row { border: 1px solid rgba(221, 82, 52, .22); }
+:root[data-theme="fhg"] .tile, :root[data-theme="fhg"] .card-link, :root[data-theme="fhg"] .panel, :root[data-theme="fhg"] .card, :root[data-theme="fhg"] .kpi, :root[data-theme="fhg"] .row { border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); }
 :root[data-theme="fhg"] .tile:hover, :root[data-theme="fhg"] .card-link:hover, :root[data-theme="fhg"] .row:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 14px 30px -16px var(--accent); }
 :root[data-theme="fhg"] .tick[aria-pressed="false"], :root[data-theme="fhg"] .switch { border-color: rgba(255, 255, 255, .35); }
 :root[data-theme="fhg"] .field input:focus, :root[data-theme="fhg"] .field select:focus, :root[data-theme="fhg"] .ask:focus-within { border-color: var(--accent); }
@@ -170,14 +161,18 @@
 :root[data-theme="fhg"] .chart .line.s2 { stroke: #ffffff; }
 :root[data-theme="fhg"] .sw.s1 { background: var(--accent); }
 :root[data-theme="fhg"] .sw.s2 { background: #ffffff; }
-:root[data-theme="fhg"] .orbit { border: 1px solid rgba(221, 82, 52, .45); }
-:root[data-theme="fhg"] .dlg { border: 1px solid rgba(221, 82, 52, .4); }
+:root[data-theme="fhg"] .orbit { border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+:root[data-theme="fhg"] .dlg { border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
 :root[data-theme="fhg"] .dlg-tab[aria-selected="true"] { color: var(--accent); }
 :root[data-theme="fhg"] ::selection { background: var(--accent); color: var(--on-accent); }
 
 /* The blue ORCA glass is turned toward the brand colour in FHG mode */
 :root[data-theme="fhg"] .hero-orb, :root[data-theme="fhg"] .brand-mark, :root[data-theme="fhg"] .welcome-mark, :root[data-theme="fhg"] .orbit-mark,
-:root[data-theme="fhg"] .orca-loader, :root[data-theme="fhg"] .msg-bot > img { filter: hue-rotate(158deg) saturate(1.5); }
+:root[data-theme="fhg"] .orca-loader, :root[data-theme="fhg"] .msg-bot > img { filter: hue-rotate(var(--orb-rot, 158deg)) saturate(1.5); }
+
+/* Background tint: the chosen accent mixed softly into the frame (Settings > Color > 背景の色味) */
+.shell::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(75% 60% at 96% 0%, color-mix(in srgb, var(--accent) calc(var(--tint, 0) * 1%), transparent), transparent 66%), radial-gradient(55% 45% at 0% 100%, color-mix(in srgb, var(--accent) calc(var(--tint, 0) * .55%), transparent), transparent 66%); }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -1025,6 +1020,24 @@ td.bad-cell { background: var(--bad-soft); color: var(--bad); font-weight: 700; 
 .slot select { width: 100%; min-height: 38px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--hair); background: var(--frame-1); font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink); }
 .link-btn { margin-top: 8px; border: 0; background: transparent; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; padding: 4px 0; }
 .set-row.is-off { opacity: .45; }
+.cp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 4px 0; }
+.cp-pick { width: 52px; height: 44px; padding: 0; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); cursor: pointer; }
+.cp-pick::-webkit-color-swatch-wrapper { padding: 4px; }
+.cp-pick::-webkit-color-swatch { border: 0; border-radius: 8px; }
+.cp-hex { width: 120px; min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--hair); background: var(--row); color: var(--ink); font: 600 15px/1 ui-monospace, Menlo, monospace; text-transform: uppercase; outline: none; }
+.cp-hex.bad { border-color: var(--bad); }
+.cp-range { flex: 1 1 200px; max-width: 420px; min-width: 0; accent-color: var(--accent); }
+.cp-out { min-width: 3em; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cp-info { margin: 6px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--sunk); font-size: 13px; color: var(--ink-2); }
+.cp-info b { color: var(--ink); font-family: ui-monospace, Menlo, monospace; }
+.cp-info .warn { color: var(--warn); font-weight: 600; }
+.cprev { display: grid; gap: 14px; padding: 16px; border-radius: var(--r-md); border: 1px solid var(--hair); background: var(--row); }
+.cprev-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.cprev .progress { width: 160px; margin: 0; }
+.cprev .progress i { width: 62%; }
+.cprev-bars { display: flex; align-items: flex-end; gap: 6px; height: 44px; }
+.cprev-bars i { width: 14px; border-radius: 3px 3px 0 0; background: var(--accent); opacity: .85; }
+.cprev-bars i:nth-child(odd) { opacity: .45; }
 .swatches { display: inline-flex; flex-wrap: wrap; gap: 8px; }
 .swatch { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 14px 0 10px; border-radius: 999px; border: 1px solid var(--hair); background: var(--row); cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--ink); }
 .swatch i { width: 16px; height: 16px; border-radius: 50%; background: var(--sw); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
