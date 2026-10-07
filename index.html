@@ -43,14 +43,18 @@
       </button>
       <a class="wordmark top-wordmark only-mobile" href="#home" role="img" aria-label="ORCA"></a>
       <div class="topbar-actions">
-        <button class="icon-btn" aria-label="通知 3件">
+        <button class="icon-btn" id="notifBtn" type="button" aria-label="お知らせ" aria-controls="notifPop">
           <svg class="i" viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>
-          <span class="dot"></span>
+          <span class="dot" id="notifDot" hidden></span>
         </button>
         <a class="avatar soft hide-mobile" href="#settings" aria-label="設定">RS</a>
+        <a class="icon-btn hide-mobile" href="#welcome" aria-label="ログアウト">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </a>
         <a class="icon-btn only-mobile" href="#chat" aria-label="新しいチャット">
           <svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
         </a>
+        <div class="popover" id="notifPop" hidden></div>
       </div>
     </header>
     <main class="view" id="view" tabindex="-1"></main>
@@ -70,6 +74,8 @@
 </section>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="core.js"></script>
+<script src="features.js"></script>
 <script src="app.js"></script>
 <!-- ORCA_BODY_END -->
 </body>
