@@ -92,8 +92,8 @@
     personal: function () {
       var cur = store.get("theme", "light"), lang = store.get("lang", "ja"), n = store.get("notify", { todo: true, night: true });
       return '<h3>個人設定</h3><p class="dlg-lead">表示や通知など、自分だけに効く設定です。</p><div class="set-list">' +
-        '<div class="set-row"><span><span class="row-title">テーマ</span><span class="row-sub">ライト・ダーク・端末に合わせる</span></span><span class="seg" role="group" aria-label="テーマ">' +
-        [["light", "ライト"], ["dark", "ダーク"], ["auto", "自動"]].map(function (k) { return '<button type="button" data-theme-set="' + k[0] + '" aria-pressed="' + (cur === k[0]) + '">' + k[1] + "</button>"; }).join("") + "</span></div>" +
+        '<div class="set-row"><span><span class="row-title">テーマ</span><span class="row-sub">ライト・ダーク・FHG（黒とブランドカラー）・端末に合わせる</span></span><span class="seg" role="group" aria-label="テーマ">' +
+        [["light", "ライト"], ["dark", "ダーク"], ["fhg", "FHG"], ["auto", "自動"]].map(function (k) { return '<button type="button" data-theme-set="' + k[0] + '" aria-pressed="' + (cur === k[0]) + '">' + k[1] + "</button>"; }).join("") + "</span></div>" +
         '<div class="set-row"><span><span class="row-title">回答の言語</span><span class="row-sub">チャットの回答に使う言語</span></span><label class="field inline"><select id="setLang">' +
         [["ja", "日本語"], ["en", "English"], ["zh", "中文"]].map(function (k) { return '<option value="' + k[0] + '"' + (lang === k[0] ? " selected" : "") + ">" + k[1] + "</option>"; }).join("") + "</select></label></div>" +
         '<div class="set-row"><span><span class="row-title">動きを減らす</span><span class="row-sub">シャチのローディングやコネクタの回転を止め、静止画で表示する</span></span>' + toggle(store.get("motion", "on") === "reduce", "data-motion", "動きを減らす") + "</div>" +

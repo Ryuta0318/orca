@@ -227,7 +227,7 @@
   O.applyTheme = applyTheme;
   function applyTheme(t) {
     if (t === "auto") document.documentElement.removeAttribute("data-theme");
-    else document.documentElement.setAttribute("data-theme", t);
+    else document.documentElement.setAttribute("data-theme", t);   // light | dark | fhg
   }
   applyTheme(theme());
 
