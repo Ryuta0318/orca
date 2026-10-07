@@ -6,6 +6,7 @@
 
   var TABS = [
     { id: "personal", label: "個人設定", icon: "sliders" },
+    { id: "home", label: "ホーム", icon: "home" },
     { id: "skills", label: "スキル", icon: "skills" },
     { id: "memory", label: "メモリ", icon: "memory" },
     { id: "notes", label: "自分のノート", icon: "note" },
@@ -64,7 +65,31 @@
   }
 
   // ---------- Panels ----------
+  function seg(attr, cur, opts) {
+    return '<span class="seg" role="group">' + opts.map(function (o) { return '<button type="button" ' + attr + '="' + o[0] + '" aria-pressed="' + (String(cur) === String(o[0])) + '">' + o[1] + "</button>"; }).join("") + "</span>";
+  }
   var PANELS = {
+    home: function () {
+      var tiles = O.homeTiles(), choices = O.TILE_CHOICES(), oh = O.onhandConfig();
+      var facs = O.FACILITIES || [];
+      return '<h3>ホーム</h3><p class="dlg-lead">ホーム画面に出す内容を、自分用に変えられます。変更はすぐに反映されます。</p>' +
+        '<h4 class="set-h">クイックアクセス <span class="muted">よく使う4つを並べます</span></h4><div class="slot-grid">' +
+        tiles.map(function (id, i) {
+          var c = choices.filter(function (x) { return x.id === id; })[0] || choices[0];
+          return '<label class="slot"><span class="slot-no">' + (i + 1) + '</span><span class="tile-icon tone-' + c.tone + '">' + ic(c.icon) + '</span><select data-slot="' + i + '" aria-label="' + (i + 1) + '番目">' +
+            choices.map(function (x) { return '<option value="' + x.id + '"' + (x.id === id ? " selected" : "") + ">" + esc(x.title) + "</option>"; }).join("") + "</select></label>";
+        }).join("") + '</div><button class="link-btn" type="button" data-tiles-reset>初期設定（Chat・Agents・Library・Integrations）に戻す</button>' +
+        '<h4 class="set-h">オンハンド <span class="muted">選んだ施設の予約済み室夜を、ホームにグラフで表示します</span></h4><div class="set-list">' +
+        '<div class="set-row"><span><span class="row-title">ホームにオンハンドを表示</span><span class="row-sub">オフのときは表示しません</span></span>' + toggle(oh.on, "data-oh-on", "ホームにオンハンドを表示") + "</div>" +
+        '<div class="set-row' + (oh.on ? "" : " is-off") + '"><span><span class="row-title">表示する期間</span><span class="row-sub">今月から数えた月数</span></span>' + seg("data-oh-months", oh.months, [[6, "6か月"], [12, "12か月"]]) + "</div>" +
+        '<div class="set-row' + (oh.on ? "" : " is-off") + '"><span><span class="row-title">内訳</span><span class="row-sub">積み上げ棒と円グラフの色分け</span></span>' + seg("data-oh-axis", oh.axis, [["channel", "チャネル区分"], ["site", "予約サイト"]]) + "</div>" +
+        '<div class="set-row col' + (oh.on ? "" : " is-off") + '"><span class="row-title">施設 <span class="muted">' + oh.facs.length + " / " + facs.length + ' 施設を選択中</span></span><div class="fac-pick">' +
+        (O.FAC_BRANDS || []).map(function (b) {
+          return '<div class="fac-group"><p>' + b + "</p>" + facs.filter(function (f) { return f.brand === b; }).map(function (f) {
+            return '<label class="fac-opt"><input type="checkbox" data-oh-fac="' + f.id + '"' + (oh.facs.indexOf(f.id) > -1 ? " checked" : "") + "> " + esc(f.area) + "</label>";
+          }).join("") + "</div>";
+        }).join("") + "</div></div></div>";
+    },
     personal: function () {
       var cur = store.get("theme", "light"), lang = store.get("lang", "ja"), n = store.get("notify", { todo: true, night: true });
       return '<h3>個人設定</h3><p class="dlg-lead">表示や通知など、自分だけに効く設定です。</p><div class="set-list">' +
@@ -139,7 +164,19 @@
     document.body.appendChild(dlg);
     dlg.addEventListener("click", onClick);
     dlg.addEventListener("submit", onSubmit);
-    dlg.addEventListener("change", function (e) { if (e.target.id === "setLang") { store.set("lang", e.target.value); O.toast("回答の言語を変更しました"); } });
+    dlg.addEventListener("change", function (e) {
+      var t = e.target;
+      if (t.id === "setLang") { store.set("lang", t.value); O.toast("回答の言語を変更しました"); }
+      if (t.hasAttribute("data-slot")) {
+        var tiles = O.homeTiles().slice(), i = +t.getAttribute("data-slot"), j = tiles.indexOf(t.value);
+        if (j > -1 && j !== i) tiles[j] = tiles[i];            // picking a tile already shown swaps the two slots
+        tiles[i] = t.value; store.set("homeTiles", tiles); show("home"); O.refreshHome();
+      }
+      if (t.hasAttribute("data-oh-fac")) {
+        var id = t.getAttribute("data-oh-fac"), on = t.checked;
+        saveOh(function (c) { c.facs = c.facs.filter(function (x) { return x !== id; }); if (on) c.facs.push(id); if (on) c.on = true; });
+      }
+    });
   }
   function show(tab) {
     current = tab;
@@ -167,8 +204,16 @@
   }
   O.closeSettings = close;
 
+  function saveOh(fn) { var c = O.onhandConfig(); fn(c); store.set("onhand", c); show("home"); O.refreshHome(); }
   function onClick(e) {
     if (e.target === dlg || e.target.closest("[data-close-dlg]")) { close(); return; }
+    var hb = e.target.closest("[data-oh-on],[data-oh-months],[data-oh-axis],[data-tiles-reset]");
+    if (hb) {
+      if (hb.hasAttribute("data-tiles-reset")) { store.set("homeTiles", ["chat", "agents", "library", "integrations"]); show("home"); O.refreshHome(); return O.toast("クイックアクセスを初期設定に戻しました"); }
+      if (hb.hasAttribute("data-oh-on")) return saveOh(function (c) { c.on = !c.on; });
+      if (hb.hasAttribute("data-oh-months")) return saveOh(function (c) { c.months = +hb.getAttribute("data-oh-months"); });
+      if (hb.hasAttribute("data-oh-axis")) return saveOh(function (c) { c.axis = hb.getAttribute("data-oh-axis"); });
+    }
     var t = e.target.closest("button");
     if (!t) return;
     if (t.hasAttribute("data-tab")) return show(t.getAttribute("data-tab"));

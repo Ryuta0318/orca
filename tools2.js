@@ -11,6 +11,7 @@
   };
   var FAC = [];
   BRANDS.forEach(function (b) { AREAS[b].forEach(function (a) { FAC.push({ id: O.hash(b + a).toString(36), brand: b, area: a, name: b + " " + a }); }); });
+  O.FACILITIES = FAC; O.FAC_BRANDS = BRANDS;
   function rnd(s) { return O.rng(O.hash(String(s))); }
   function sideToggle() { return '<button class="icon-btn ghost side-collapse" type="button" data-side-collapse aria-label="サイドバーを閉じる">' + icon("library") + "</button>"; }
   function download(name, blob) {

@@ -125,6 +125,15 @@
     }
     requestAnimationFrame(frame);
   }
+  // Quick-access tiles on Home: chosen in Settings > Home (4 slots)
+  O.TILE_CHOICES = function () {
+    return [{ id: "chat", title: "Chat", sub: "相談・調べる", icon: "chat", tone: "blue" }, { id: "agents", title: "Agents", sub: "業務を自動化", icon: "agents", tone: "violet" },
+      { id: "library", title: "Library", sub: "社内ナレッジ", icon: "library", tone: "mint" }, { id: "integrations", title: "Integrations", sub: "外部サービス連携", icon: "integrations", tone: "blue" },
+      { id: "search", title: "Search", sub: "まとめて探す", icon: "search", tone: "violet" }]
+      .concat(O.FEATURES.filter(function (f) { return f.id !== "chat"; }).map(function (f) { return { id: f.id, title: f.title, sub: f.sub, icon: f.icon, tone: f.tone }; }));
+  };
+  O.homeTiles = function () { return store.get("homeTiles", ["chat", "agents", "library", "integrations"]); };
+  O.refreshHome = function () { if (lastPage === "home") render("home"); };
   function group(g) { return O.FEATURES.filter(function (f) { return f.group === g && f.id !== "chat"; }); }
 
   // ---------- Views ----------
@@ -137,12 +146,10 @@
       "<h1>All<br>connects here.</h1>" +
       '<p class="hero-sub">つながる。ひろがる。動き出す。</p>' +
       askBar("homeAsk", "何でも聞いてください…") +
-      '<div class="quick">' +
-      quickTile("chat", "Chat", "相談・調べる", "blue", "chat") +
-      quickTile("agents", "Agents", "業務を自動化", "violet", "agents") +
-      quickTile("library", "Library", "社内ナレッジ", "mint", "library") +
-      quickTile("integrations", "Integrations", "外部サービス連携", "blue", "integrations") +
-      "</div></section>" +
+      '<div class="quick">' + O.homeTiles().map(function (id) {
+        var c = O.TILE_CHOICES().filter(function (x) { return x.id === id; })[0];
+        return c ? quickTile(c.id, esc(c.title), esc(c.sub), c.tone, c.icon) : "";
+      }).join("") + "</div></section>" + O.onhandPanel() +
       '<div class="panels">' +
       '<section class="panel"><div class="section-head"><h2>Agents</h2><a class="see-all" href="#agents">すべて見る</a></div><p class="panel-sub">日々の業務を、ORCAと一緒に。</p><div class="rows">' + ag.map(featureRow).join("") + "</div></section>" +
       '<section class="panel"><div class="section-head"><h2>Library</h2><a class="see-all" href="#library">すべて見る</a></div><p class="panel-sub">必要な情報に、すぐアクセス。</p><div class="rows">' + lib.map(featureRow).join("") + "</div></section>" +
@@ -248,6 +255,10 @@
   }
   window.addEventListener("hashchange", function () { depth++; route(); });
   O.currentPage = function () { return lastPage; };
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-open-settings]");
+    if (b) O.openSettings(b.getAttribute("data-open-settings"));
+  });
   // Settings opens as a dialog over the current page without touching history
   document.addEventListener("click", function (e) {
     var a = e.target.closest('a[href="#settings"]');
