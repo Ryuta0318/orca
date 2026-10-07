@@ -134,6 +134,30 @@
   };
   O.homeTiles = function () { return store.get("homeTiles", ["chat", "agents", "library", "integrations"]); };
   O.refreshHome = function () { if (lastPage === "home") render("home"); };
+  // On phones a tool's sidebar folds behind one button that shows the current choice
+  function mobileSidebar(layout) {
+    var side = layout.querySelector(".tool-side");
+    if (!side) return;
+    var btn = document.createElement("button");
+    btn.type = "button"; btn.className = "side-open-btn"; btn.setAttribute("aria-expanded", "false");
+    layout.insertBefore(btn, layout.firstChild);
+    function label() {
+      var title = (side.querySelector(".side-title") || {}).textContent || "絞り込み";
+      var cur = side.querySelector('.side-item[aria-current="true"] span');
+      btn.innerHTML = icon("search") + "<span>" + esc(title) + (cur ? " <em>" + esc(cur.textContent.trim()) + "</em>" : "") + "</span>" + icon("chev", "chev");
+    }
+    btn.addEventListener("click", function () {
+      var open = layout.classList.toggle("side-open");
+      btn.setAttribute("aria-expanded", String(open));
+    });
+    // Picking a single item (area, facility, folder…) closes the panel on phones
+    side.addEventListener("click", function (e) {
+      if (e.target.closest(".side-item:not(.tree)") && window.matchMedia("(max-width: 860px)").matches) { layout.classList.remove("side-open"); btn.setAttribute("aria-expanded", "false"); }
+      setTimeout(label, 0);
+    });
+    side.addEventListener("change", function () { setTimeout(label, 0); });
+    label();
+  }
   function group(g) { return O.FEATURES.filter(function (f) { return f.group === g && f.id !== "chat"; }); }
 
   // ---------- Views ----------
@@ -247,6 +271,7 @@
     if (O.AFTER[id]) O.AFTER[id](view.firstElementChild);
     view.querySelectorAll(".orbit").forEach(animateOrbit);
     if (id === "home") O.mountOnhand(view.firstElementChild);
+    view.querySelectorAll(".tool-layout").forEach(mobileSidebar);
     lastPage = id;
     if (id === "search") { renderResults(""); document.getElementById("searchBox").focus(); }
     if (id === "chat") { var m = document.getElementById("messages"); m.scrollTop = m.scrollHeight; }
