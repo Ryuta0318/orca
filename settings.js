@@ -1,0 +1,216 @@
+/* ORCA settings dialog: personal settings, skills, memory, notes, search scope and usage. */
+(function () {
+  "use strict";
+  var O = window.ORCA;
+  var icon = O.icon, esc = O.esc, store = O.store;
+
+  var TABS = [
+    { id: "personal", label: "個人設定", icon: "sliders" },
+    { id: "skills", label: "スキル", icon: "skills" },
+    { id: "memory", label: "メモリ", icon: "memory" },
+    { id: "notes", label: "自分のノート", icon: "note" },
+    { id: "scope", label: "検索範囲 / コネクタ", icon: "connector" },
+    { id: "usage", label: "利用状況", icon: "usage" }
+  ];
+  // Extra icons used only here
+  var EXTRA = {
+    sliders: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+    skills: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/>',
+    memory: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M3.5 9h3M17.5 15h3"/>',
+    note: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+    connector: '<path d="M7 7h4v4H7zM13 13h4v4h-4z"/><path d="M11 9h3a2 2 0 0 1 2 2v2M7 11v3a2 2 0 0 0 2 2h4"/>',
+    usage: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+    box: '<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/>',
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'
+  };
+  function ic(name) {
+    return EXTRA[name] ? '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + EXTRA[name] + "</svg>" : icon(name);
+  }
+
+  var SKILLS = [
+    { id: "minutes", name: "議事録まとめ", cmd: "/minutes", sub: "会議メモから決定事項・宿題・期限を整理する" },
+    { id: "compreport", name: "競合レポート作成", cmd: "/compare", sub: "競合調査と口コミのデータから週次の比較レポートを作る" },
+    { id: "reply", name: "口コミ返信の下書き", cmd: "/reply", sub: "口コミの内容に合わせた返信文を、施設のトーンで下書きする" },
+    { id: "mail", name: "メールの下書き", cmd: "/mail", sub: "要点を箇条書きで渡すと、社内外向けのメール文にする" },
+    { id: "translate", name: "翻訳（日・英・中）", cmd: "/translate", sub: "案内文や掲載文を3言語に翻訳する" },
+    { id: "sheet", name: "表の集計", cmd: "/sheet", sub: "貼り付けた表を集計し、要点を文章でまとめる" }
+  ];
+  var SCOPE = [
+    { icon: "chats", t: "Teams内ファイル検索", s: "Teams のファイルとやり取りを検索", on: true },
+    { icon: "book", t: "Hotel AI Wiki検索", s: "社内ナレッジ（Hotel AI Wiki）のノートを検索。回答の基本となる検索先", on: true },
+    { icon: "globe", t: "Web検索", s: "社外の公開情報を Web で検索", on: true },
+    { icon: "box", t: "Box内ファイル検索", s: "Box 上のファイルを検索", on: true },
+    { icon: "binoculars", t: "競合価格・パリティ データ", s: "競合ホテルの価格レンジと公式サイト最安の判定（競合調査の集計）", on: true },
+    { icon: "star", t: "口コミ・評判データ", s: "OTA別スコア・エリア内順位・トピック別の評価（口コミ収集の集計）", on: true },
+    { icon: "chart", t: "販売実績データ", s: "施設別の室夜・稼働率・ADR・RevPAR（ダッシュボードの集計）", on: true },
+    { icon: "lock", t: "経理・人事データ", s: "会計・給与・人事評価の情報", on: false }
+  ];
+  var MEMORY_SEED = ["担当施設は由布院と高山", "回答は箇条書きで短めに", "金額は税込で表示する", "競合は競合A・B・Cの3施設を基準にする"];
+  var NOTES_SEED = [
+    { t: "由布院 秋の販促メモ", b: "紅葉シーズンは連泊割を強化。公式サイトのバナーを10/15に差し替え。", d: -2 },
+    { t: "口コミ返信のトーン", b: "最初にお礼、次に具体的な改善内容、最後に再訪のお誘い。定型文は避ける。", d: -9 }
+  ];
+
+  function memories() { var m = store.get("memory", null); if (!m) { m = MEMORY_SEED.slice(); store.set("memory", m); } return m; }
+  function notes() {
+    var n = store.get("notes", null);
+    if (!n) { n = NOTES_SEED.map(function (x, i) { return { id: "s" + i, t: x.t, b: x.b, at: O.iso(O.addDays(O.TODAY, x.d)) }; }); store.set("notes", n); }
+    return n;
+  }
+  function skillOn(id) { var s = store.get("skills", {}); return s[id] !== false; }
+  function toggle(on, attr, label) {
+    return '<button class="switch" type="button" role="switch" aria-checked="' + on + '" aria-label="' + esc(label) + '" ' + attr + "><span></span></button>";
+  }
+
+  // ---------- Panels ----------
+  var PANELS = {
+    personal: function () {
+      var cur = store.get("theme", "light"), lang = store.get("lang", "ja"), n = store.get("notify", { todo: true, night: true });
+      return '<h3>個人設定</h3><p class="dlg-lead">表示や通知など、自分だけに効く設定です。</p><div class="set-list">' +
+        '<div class="set-row"><span><span class="row-title">テーマ</span><span class="row-sub">ライト・ダーク・端末に合わせる</span></span><span class="seg" role="group" aria-label="テーマ">' +
+        [["light", "ライト"], ["dark", "ダーク"], ["auto", "自動"]].map(function (k) { return '<button type="button" data-theme-set="' + k[0] + '" aria-pressed="' + (cur === k[0]) + '">' + k[1] + "</button>"; }).join("") + "</span></div>" +
+        '<div class="set-row"><span><span class="row-title">回答の言語</span><span class="row-sub">チャットの回答に使う言語</span></span><label class="field inline"><select id="setLang">' +
+        [["ja", "日本語"], ["en", "English"], ["zh", "中文"]].map(function (k) { return '<option value="' + k[0] + '"' + (lang === k[0] ? " selected" : "") + ">" + k[1] + "</option>"; }).join("") + "</select></label></div>" +
+        '<div class="set-row"><span><span class="row-title">TODO のリマインド</span><span class="row-sub">期限の日の朝にお知らせする</span></span>' + toggle(n.todo, 'data-notify="todo"', "TODO のリマインド") + "</div>" +
+        '<div class="set-row"><span><span class="row-title">夜タスクの完了通知</span><span class="row-sub">結果が出たらお知らせする</span></span>' + toggle(n.night, 'data-notify="night"', "夜タスクの完了通知") + "</div>" +
+        '<div class="set-row"><span><span class="row-title">デモデータをリセット</span><span class="row-sub">TODO・夜タスク・台帳・メモリ・ノートを初期状態に戻す</span></span><button class="chip" type="button" data-reset>リセット</button></div>' +
+        '<div class="set-row"><span><span class="row-title">サインイン画面</span><span class="row-sub">ログイン前の画面を表示する</span></span><a class="chip" href="#welcome" data-close-dlg>表示する</a></div>' +
+        '<form class="set-row col" id="fbForm"><label class="row-title" for="fbText">フィードバックを送信</label><textarea id="fbText" rows="3" required placeholder="使いにくい点や欲しい機能を書いてください"></textarea><div class="form-foot"><span class="hint">デモ版のため、この端末に保存されます。</span><button class="btn btn-primary" type="submit">送信</button></div></form>' +
+        "</div>";
+    },
+    skills: function () {
+      return '<h3>スキル</h3><p class="dlg-lead">チャットの入力欄で「/」を押すと呼び出せる定型の作業です。オフにしたスキルは候補に出ません。</p><div class="set-list">' +
+        SKILLS.map(function (s) {
+          return '<div class="set-row"><span class="set-icon">' + ic("skills") + '</span><span class="row-body"><span class="row-title">' + esc(s.name) + ' <code>' + s.cmd + '</code></span><span class="row-sub wrap">' + esc(s.sub) + "</span></span>" +
+            toggle(skillOn(s.id), 'data-skill="' + s.id + '"', s.name) + "</div>";
+        }).join("") + "</div>";
+    },
+    memory: function () {
+      var m = memories();
+      return '<h3>メモリ</h3><p class="dlg-lead">ORCA が回答のたびに前提として使う、あなたについての情報です。不要なものは削除できます。</p>' +
+        '<form class="add-row" id="memForm"><input id="memText" required placeholder="例: 会議は火曜と木曜の午前が多い" aria-label="覚えさせる内容"><button class="btn btn-primary" type="submit">' + icon("plus") + "追加</button></form>" +
+        '<div class="set-list">' + (m.length ? m.map(function (x, i) {
+          return '<div class="set-row"><span class="set-icon">' + ic("memory") + '</span><span class="row-body"><span class="row-title wrap">' + esc(x) + '</span></span><button class="icon-btn ghost" type="button" data-mem-del="' + i + '" aria-label="削除">' + icon("trash") + "</button></div>";
+        }).join("") : '<p class="empty">覚えている情報はありません。</p>') + "</div>";
+    },
+    notes: function () {
+      var n = notes();
+      return '<h3>自分のノート</h3><p class="dlg-lead">自分だけが見られるメモです。回答の参考資料にも使われます。</p>' +
+        '<form class="note-form" id="noteForm"><input id="noteTitle" required placeholder="タイトル" aria-label="タイトル"><textarea id="noteBody" rows="2" placeholder="内容" aria-label="内容"></textarea><button class="btn btn-primary" type="submit">' + icon("plus") + "ノートを追加</button></form>" +
+        '<div class="set-list">' + (n.length ? n.map(function (x) {
+          return '<div class="set-row top"><span class="set-icon">' + ic("note") + '</span><span class="row-body"><span class="row-title">' + esc(x.t) + '</span><span class="row-sub wrap">' + esc(x.b) +
+            '</span><span class="row-sub">' + O.mdw(new Date(x.at + "T00:00:00")) + ' 更新</span></span><button class="icon-btn ghost" type="button" data-note-del="' + x.id + '" aria-label="削除">' + icon("trash") + "</button></div>";
+        }).join("") : '<p class="empty">ノートはまだありません。</p>') + "</div>";
+    },
+    scope: function () {
+      return '<h3>検索範囲 / コネクタ</h3><p class="dlg-lead">回答の作成時に参照する検索先の一覧です。質問に合う情報を、ここに載っている検索先から探します。参照できるのは権限の範囲内の内容です。</p><div class="set-list boxed">' +
+        SCOPE.map(function (s) {
+          return '<div class="set-row"><span class="set-icon">' + ic(s.icon) + '</span><span class="row-body"><span class="row-title">' + esc(s.t) + '</span><span class="row-sub wrap">' + esc(s.s) + "</span></span>" +
+            '<span class="pill ' + (s.on ? "info" : "") + '">' + (s.on ? "利用中" : "対象外") + "</span></div>";
+        }).join("") + "</div>";
+    },
+    usage: function () {
+      var r = O.rng(77), days = [], total = 0;
+      for (var i = 29; i >= 0; i--) { var v = Math.round(4 + r() * 14 + (i % 7 < 2 ? -3 : 2)); days.push(Math.max(0, v)); total += Math.max(0, v); }
+      var by = [["ORCA チャット", 0.46], ["競合調査", 0.14], ["パリティ判定", 0.11], ["TODO", 0.1], ["口コミ・ランキング分析", 0.09], ["その他", 0.1]];
+      return '<h3>利用状況</h3><p class="dlg-lead">直近30日間の利用です（サンプルデータ）。</p>' +
+        '<div class="kpis three"><div class="kpi"><span class="kpi-label">質問数</span><span class="kpi-value">' + total + '</span><span class="kpi-note">直近30日</span></div>' +
+        '<div class="kpi"><span class="kpi-label">1日平均</span><span class="kpi-value">' + (total / 30).toFixed(1) + '</span><span class="kpi-note">回</span></div>' +
+        '<div class="kpi"><span class="kpi-label">参照した資料</span><span class="kpi-value">' + Math.round(total * 2.3) + '</span><span class="kpi-note">件</span></div></div>' +
+        '<section class="card pad"><h2>日別の質問数</h2>' + O.barChart(days, days.map(function (_, i) { return O.md(O.addDays(O.TODAY, i - 29)); }), function (v) { return Math.round(v) + ""; }) + "</section>" +
+        '<section class="card pad"><h2>機能別</h2><div class="share">' + by.map(function (b) {
+          return '<div class="share-row"><span class="share-name">' + b[0] + '</span><span class="share-bar"><i style="width:' + (b[1] * 100 / 0.46) + '%"></i></span><span class="share-val">' + Math.round(b[1] * 100) + "%</span></div>";
+        }).join("") + "</div></section>";
+    }
+  };
+
+  // ---------- Dialog ----------
+  var dlg, current = "scope", lastFocus;
+  function build() {
+    dlg = document.createElement("div");
+    dlg.className = "dlg-wrap";
+    dlg.hidden = true;
+    dlg.innerHTML = '<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">' +
+      '<header class="dlg-head"><span class="dlg-badge">' + ic("sliders") + '</span><h2 id="dlgTitle">設定</h2><button class="icon-btn ghost dlg-x" type="button" data-close-dlg aria-label="閉じる">' + icon("x") + "</button></header>" +
+      '<nav class="dlg-tabs" role="tablist">' + TABS.map(function (t) {
+        return '<button class="dlg-tab" role="tab" type="button" data-tab="' + t.id + '" aria-selected="false">' + ic(t.icon) + "<span>" + t.label + "</span></button>";
+      }).join("") + '</nav><div class="dlg-body" id="dlgBody" role="tabpanel"></div><footer class="dlg-foot" id="dlgFoot" hidden></footer></div>';
+    document.body.appendChild(dlg);
+    dlg.addEventListener("click", onClick);
+    dlg.addEventListener("submit", onSubmit);
+    dlg.addEventListener("change", function (e) { if (e.target.id === "setLang") { store.set("lang", e.target.value); O.toast("回答の言語を変更しました"); } });
+  }
+  function show(tab) {
+    current = tab;
+    dlg.querySelectorAll("[data-tab]").forEach(function (b) { b.setAttribute("aria-selected", String(b.getAttribute("data-tab") === tab)); });
+    dlg.querySelector("#dlgBody").innerHTML = PANELS[tab]();
+    dlg.querySelector("#dlgBody").scrollTop = 0;
+    var foot = dlg.querySelector("#dlgFoot");
+    foot.hidden = tab !== "scope";
+    foot.textContent = "検索範囲はこの画面では変更できません。「対象外」は、権限の範囲外の検索先です。";
+  }
+  O.openSettings = function (tab) {
+    if (!dlg) build();
+    lastFocus = document.activeElement;
+    dlg.hidden = false;
+    document.body.classList.add("dlg-open");
+    show(tab || current);
+    dlg.querySelector('[data-tab="' + current + '"]').focus();
+  };
+  function close() {
+    if (!dlg || dlg.hidden) return;
+    dlg.hidden = true;
+    document.body.classList.remove("dlg-open");
+    if (location.hash === "#settings") history.replaceState(null, "", "#" + (O.currentPage ? O.currentPage() : "home"));
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  O.closeSettings = close;
+
+  function onClick(e) {
+    if (e.target === dlg || e.target.closest("[data-close-dlg]")) { close(); return; }
+    var t = e.target.closest("button");
+    if (!t) return;
+    if (t.hasAttribute("data-tab")) return show(t.getAttribute("data-tab"));
+    if (t.hasAttribute("data-theme-set")) {
+      var v = t.getAttribute("data-theme-set");
+      store.set("theme", v);
+      O.applyTheme(v);
+      t.parentNode.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b === t)); });
+    } else if (t.hasAttribute("data-skill")) {
+      var s = store.get("skills", {}), id = t.getAttribute("data-skill");
+      s[id] = !skillOn(id); store.set("skills", s);
+      t.setAttribute("aria-checked", String(s[id]));
+    } else if (t.hasAttribute("data-notify")) {
+      var n = store.get("notify", { todo: true, night: true }), k = t.getAttribute("data-notify");
+      n[k] = !n[k]; store.set("notify", n);
+      t.setAttribute("aria-checked", String(n[k]));
+    } else if (t.hasAttribute("data-mem-del")) {
+      var m = memories(); m.splice(+t.getAttribute("data-mem-del"), 1); store.set("memory", m); show("memory");
+      O.toast("メモリから削除しました");
+    } else if (t.hasAttribute("data-note-del")) {
+      store.set("notes", notes().filter(function (x) { return x.id !== t.getAttribute("data-note-del"); })); show("notes");
+      O.toast("ノートを削除しました");
+    } else if (t.hasAttribute("data-reset")) {
+      var keep = store.get("theme", "light");
+      store.clear(); store.set("theme", keep);
+      O.refreshBadges(); O.renderNotifs();
+      O.toast("デモデータを初期状態に戻しました");
+    }
+  }
+  function onSubmit(e) {
+    e.preventDefault();
+    var f = e.target;
+    if (f.id === "memForm") {
+      var m = memories(); m.unshift(f.querySelector("input").value.trim()); store.set("memory", m); show("memory"); O.toast("メモリに追加しました");
+    } else if (f.id === "noteForm") {
+      var n = notes();
+      n.unshift({ id: "n" + Date.now(), t: f.querySelector("#noteTitle").value.trim(), b: f.querySelector("#noteBody").value.trim(), at: O.iso(new Date()) });
+      store.set("notes", n); show("notes"); O.toast("ノートを追加しました");
+    } else if (f.id === "fbForm") {
+      var fb = store.get("feedback", []); fb.push({ at: new Date().toISOString(), text: f.querySelector("textarea").value.trim() });
+      store.set("feedback", fb); f.reset(); O.toast("フィードバックを保存しました");
+    }
+  }
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && dlg && !dlg.hidden) { e.stopPropagation(); close(); } }, true);
+})();

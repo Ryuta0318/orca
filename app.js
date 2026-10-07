@@ -98,11 +98,31 @@
   function quickTile(id, title, sub, tone, ic) {
     return '<a class="tile" href="#' + id + '"><span class="tile-icon tone-' + tone + '">' + icon(ic) + '</span><span class="tile-title">' + title + '</span><span class="tile-sub">' + sub + "</span></a>";
   }
-  function orbitCard() {
-    var nodes = [["notion", 50, 14, true], ["drive", 87, 34], ["teams", 85, 70], ["salesforce", 15, 70], ["slack", 13, 34]];
-    return '<a class="orbit" href="#integrations" aria-label="Integrations を開く"><span class="orbit-ring"></span>' +
-      nodes.map(function (n) { return '<span class="orbit-node' + (n[3] ? " light" : "") + '" style="left:' + n[1] + "%;top:" + n[2] + '%">' + logo(n[0]) + "</span>"; }).join("") +
+  function orbitCard(big) {
+    return '<a class="orbit' + (big ? " big" : "") + '" href="#integrations" aria-label="Integrations を開く"><span class="orbit-ring"></span><span class="orbit-ring r2"></span>' +
+      APPS.map(function (a) { return '<span class="orbit-node" data-node>' + logo(a.key) + "</span>"; }).join("") +
       '<img class="orbit-mark" src="' + MARK + '" alt=""><span class="wordmark"></span></a>';
+  }
+  // Connector icons circle the mark on a tilted ellipse; nearer icons are larger and pass in front
+  function animateOrbit(el) {
+    var nodes = [].slice.call(el.querySelectorAll("[data-node]")), mark = el.querySelector(".orbit-mark");
+    var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var t0 = performance.now();
+    function frame(now) {
+      if (!el.isConnected) return;
+      var w = el.clientWidth, h = el.clientHeight, cx = w / 2, cy = h * 0.46;
+      var rx = Math.min(w * 0.4, h * 0.62), ry = rx * 0.34, t = still ? 0 : (now - t0) / 1000;
+      nodes.forEach(function (n, i) {
+        var a = t * 0.45 + i * Math.PI * 2 / nodes.length, z = Math.sin(a);
+        var sc = 0.72 + 0.32 * (z + 1) / 2;
+        n.style.transform = "translate(" + (cx + rx * Math.cos(a)) + "px," + (cy + ry * z) + "px) translate(-50%,-50%) scale(" + sc.toFixed(3) + ")";
+        n.style.zIndex = z > 0 ? 3 : 1;
+        n.style.opacity = (0.55 + 0.45 * (z + 1) / 2).toFixed(3);
+      });
+      if (mark) mark.style.transform = "translate(-50%,-50%) translateY(" + (4 * Math.sin(t * 1.3)).toFixed(2) + "px)";
+      if (!still) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
   }
   function group(g) { return O.FEATURES.filter(function (f) { return f.group === g && f.id !== "chat"; }); }
 
@@ -150,23 +170,12 @@
   };
   V.integrations = function () {
     var on = connected();
-    return O.pageHead("integrations") + '<div class="split">' + orbitCard() + '<div class="rows">' + APPS.map(function (a) {
+    return O.pageHead("integrations") + '<div class="split">' + orbitCard(true) + '<div class="rows">' + APPS.map(function (a) {
       var c = on.indexOf(a.name) > -1;
       return '<div class="row"><span class="logo-tile">' + logo(a.key) + '</span><span class="row-body"><span class="row-title">' + esc(a.name) + '</span><span class="row-sub">' + (c ? "接続済み" : "未接続") + "</span></span>" +
         '<button class="chip" type="button" data-toggle="' + esc(a.name) + '" aria-pressed="' + c + '">' + (c ? "接続中" : "接続する") + "</button></div>";
     }).join("") + "</div></div>";
   };
-  V.settings = function () {
-    var cur = theme();
-    return O.pageHead("settings") + '<div class="settings">' +
-      '<div class="setting"><span><span class="row-title">テーマ</span><span class="row-sub">ライト・ダーク・端末に合わせる</span></span><span class="seg" role="group" aria-label="テーマ">' +
-      [["light", "ライト"], ["dark", "ダーク"], ["auto", "自動"]].map(function (k) { return '<button type="button" data-theme-set="' + k[0] + '" aria-pressed="' + (cur === k[0]) + '">' + k[1] + "</button>"; }).join("") + "</span></div>" +
-      '<div class="setting"><span><span class="row-title">デモデータをリセット</span><span class="row-sub">TODO・夜タスク・RM 台帳・連携の状態を初期状態に戻す</span></span><button class="chip" type="button" data-reset>リセット</button></div>' +
-      '<div class="setting"><span><span class="row-title">サインイン画面</span><span class="row-sub">ログイン前の画面を表示する</span></span><a class="chip" href="#welcome">表示する</a></div>' +
-      '<form class="setting col" id="fbForm"><label class="row-title" for="fbText">フィードバックを送信</label><textarea id="fbText" rows="3" required placeholder="使いにくい点や欲しい機能を書いてください"></textarea><div class="form-foot"><span class="hint">デモ版のため、この端末に保存されます。</span><button class="btn btn-primary" type="submit">送信</button></div></form>' +
-      "</div>";
-  };
-
   // ---------- Search ----------
   function renderResults(q) {
     q = q.trim().toLowerCase();
@@ -181,6 +190,7 @@
 
   // ---------- Theme ----------
   function theme() { return store.get("theme", "light"); }
+  O.applyTheme = applyTheme;
   function applyTheme(t) {
     if (t === "auto") document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", t);
@@ -189,6 +199,7 @@
 
   // ---------- Notifications ----------
   var pop = document.getElementById("notifPop");
+  O.renderNotifs = function () { renderNotifs(); };
   function renderNotifs() {
     var todos = store.get("todos", []).filter(function (t) { return !t.done && new Date(t.due + "T00:00:00") <= O.TODAY; });
     var night = store.get("night", []).filter(function (t) { return t.status === "done"; });
@@ -204,6 +215,16 @@
     pop.hidden = true;
     if (id === "welcome") { welcome.hidden = false; return; }
     welcome.hidden = true;
+    if (id === "settings") {
+      if (!view.getAttribute("data-page")) { id = "home"; history.replaceState(null, "", "#home"); render(id); }
+      O.openSettings();
+      return;
+    }
+    O.closeSettings && O.closeSettings();
+    render(id);
+  }
+  var lastPage = "home";
+  function render(id) {
     if (!V[id]) id = "home";
     view.innerHTML = V[id]();
     view.setAttribute("data-page", id);
@@ -215,6 +236,8 @@
     shell.classList.remove("open");
     document.getElementById("menuBtn").setAttribute("aria-expanded", "false");
     if (O.AFTER[id]) O.AFTER[id](view);
+    view.querySelectorAll(".orbit").forEach(animateOrbit);
+    lastPage = id;
     if (id === "search") { renderResults(""); document.getElementById("searchBox").focus(); }
     if (id === "chat") { var m = document.getElementById("messages"); m.scrollTop = m.scrollHeight; }
     O.refreshBadges();
@@ -222,6 +245,15 @@
     document.querySelector(".main").scrollTop = 0;
   }
   window.addEventListener("hashchange", function () { depth++; route(); });
+  O.currentPage = function () { return lastPage; };
+  // Settings opens as a dialog over the current page without touching history
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest('a[href="#settings"]');
+    if (!a) return;
+    e.preventDefault();
+    shell.classList.remove("open");
+    O.openSettings();
+  });
 
   // ---------- Events ----------
   document.getElementById("menuBtn").addEventListener("click", function () {
@@ -255,8 +287,16 @@
     input.value = "";
     function post() {
       var m = document.getElementById("messages");
-      m.insertAdjacentHTML("beforeend", '<div class="msg-user">' + esc(text) + '</div><div class="note">デモ版のため回答は生成されません</div>');
+      m.insertAdjacentHTML("beforeend", '<div class="msg-user">' + esc(text) + "</div>" +
+        '<div class="thinking" role="status"><canvas class="orca-loader" aria-hidden="true"></canvas><span class="thinking-text">考えています<span class="dots"><i></i><i></i><i></i></span></span></div>');
+      var th = m.lastElementChild, loader = O.loader(th.querySelector("canvas"));
       m.scrollTop = m.scrollHeight;
+      setTimeout(function () {
+        loader.stop();
+        if (!th.isConnected) return;
+        th.outerHTML = '<div class="note">デモ版のため回答は生成されません</div>';
+        m.scrollTop = m.scrollHeight;
+      }, 4200);
     }
     if (view.getAttribute("data-page") !== "chat") {
       HISTORY.unshift(text.slice(0, 40));
