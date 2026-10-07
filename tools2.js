@@ -268,7 +268,10 @@
   };
 
   // ================= ダッシュボード =================
-  var PAL = ["#e8794a", "#2fae78", "#e0a72e", "#4a7ff0", "#d9547a", "#7a6ae8", "#2aa7b8", "#9a7b4f", "#5b6577", "#c94f4f"];
+  var PAL_STD = ["#e8794a", "#2fae78", "#e0a72e", "#4a7ff0", "#d9547a", "#7a6ae8", "#2aa7b8", "#9a7b4f", "#5b6577", "#c94f4f"];
+  var PAL_FHG = ["#dd5234", "#ffffff", "#f2b45a", "#8f8d87", "#f2785b", "#d9d9d9", "#b8452b", "#ffd9a8", "#6f6d68", "#ff9a7d"];
+  var PAL = { get length() { return PAL_STD.length; } };   // PAL[i] picks the palette of the current theme
+  PAL_STD.forEach(function (_, i) { Object.defineProperty(PAL, i, { get: function () { return (document.documentElement.getAttribute("data-theme") === "fhg" ? PAL_FHG : PAL_STD)[i]; } }); });
   var MONTHS = [];
   (function () { for (var k = 11; k >= -4; k--) { var d = new Date(O.TODAY.getFullYear(), O.TODAY.getMonth() - k, 1); MONTHS.push(d); } })();
   function ym(d) { return String(d.getFullYear()).slice(2) + "年" + (d.getMonth() + 1) + "月"; }

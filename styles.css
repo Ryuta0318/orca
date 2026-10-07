@@ -77,34 +77,98 @@
   color-scheme: dark;
 }
 
-/* ---------- FHG mode: black mixed with the FHG vermilion (#dd5234) ---------- */
+/* ---------- FHG mode: black base, FHG vermilion (#dd5234) as the accent used throughout ---------- */
 :root[data-theme="fhg"] {
-  --page: #160a07; --frame-1: #1e0d09; --frame-2: #180b08; --frame-3: #26100b; --frame-edge: rgba(221, 82, 52, .16);
-  --sidebar: rgba(221, 82, 52, .05); --glass: rgba(46, 20, 15, .66); --card: rgba(40, 17, 12, .82); --row: rgba(52, 22, 16, .92); --sunk: #2a120d;
-  --ink: #f7efec; --ink-2: #dccbc5; --muted: #ab948c; --hair: rgba(247, 225, 218, .09);
-  --accent: #dd5234; --accent-2: #f2785b; --accent-soft: rgba(221, 82, 52, .18); --on-accent: #140a07;
-  --violet: #c4a3ff; --violet-soft: rgba(196, 163, 255, .14); --mint: #5fd1a0; --mint-soft: rgba(95, 209, 160, .13);
-  --coral: #f2b45a; --coral-soft: rgba(242, 180, 90, .14); --rose: #ff8aab; --rose-soft: rgba(255, 138, 171, .14);
+  --page: #000000; --frame-1: #060606; --frame-2: #000000; --frame-3: #0d0d0d; --frame-edge: rgba(221, 82, 52, .28);
+  --sidebar: rgba(255, 255, 255, .025); --glass: rgba(255, 255, 255, .05); --card: rgba(255, 255, 255, .045); --row: #121212; --sunk: #1b1b1b;
+  --ink: #ffffff; --ink-2: #dcdcdc; --muted: #9b9993; --hair: rgba(255, 255, 255, .11);
+  --accent: #dd5234; --accent-2: #f2785b; --accent-soft: rgba(221, 82, 52, .17); --on-accent: #0a0a0a;
+  --violet: #dd5234; --violet-soft: rgba(221, 82, 52, .17); --mint: #dd5234; --mint-soft: rgba(221, 82, 52, .17);
+  --coral: #f2b45a; --coral-soft: rgba(242, 180, 90, .15); --rose: #dd5234; --rose-soft: rgba(221, 82, 52, .17);
   --good: #5fd1a0; --good-soft: rgba(95, 209, 160, .14); --bad: #ff8a80; --bad-soft: rgba(255, 138, 128, .15); --warn: #f2c46a; --warn-soft: rgba(242, 196, 106, .14);
-  --c-ty: #f0775b; --c-ly: #bfaea8; --c-bud: #f2c46a; --star: #f2c46a;
-  --night: #0a0504; --night-2: #2a110c; --on-night: #f7efec;
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, .35), 0 10px 28px -14px rgba(0, 0, 0, .7);
-  --shadow-frame: 0 40px 90px -40px rgba(221, 82, 52, .35), 0 2px 6px rgba(0, 0, 0, .4);
+  --c-ty: #dd5234; --c-ly: #8f8d87; --c-bud: #ffffff; --star: #f2c46a;
+  --night: #000000; --night-2: #1d0e0a; --on-night: #ffffff;
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 30px -14px rgba(0, 0, 0, .9);
+  --shadow-frame: 0 40px 90px -40px rgba(221, 82, 52, .4), 0 2px 6px rgba(0, 0, 0, .5);
+  --font-head: "Oswald", "Noto Sans JP", "Hiragino Sans", sans-serif;
   color-scheme: dark;
 }
-:root[data-theme="fhg"] body {
-  background: radial-gradient(60rem 40rem at 92% -8%, rgba(221, 82, 52, .26), transparent 62%), radial-gradient(48rem 34rem at -8% 108%, rgba(221, 82, 52, .14), transparent 60%), var(--page);
-  background-attachment: fixed;
-}
-:root[data-theme="fhg"] .shell { background: radial-gradient(70% 60% at 95% 0%, rgba(221, 82, 52, .14), transparent 60%), linear-gradient(115deg, var(--frame-1) 0%, var(--frame-2) 55%, var(--frame-3) 100%); }
-:root[data-theme="fhg"] .welcome { background: radial-gradient(50rem 30rem at 50% 15%, rgba(221, 82, 52, .28), transparent 65%), linear-gradient(180deg, var(--frame-3), var(--frame-1) 55%); }
-:root[data-theme="fhg"] .btn-primary, :root[data-theme="fhg"] .send { box-shadow: 0 8px 22px -10px var(--accent); }
-:root[data-theme="fhg"] .btn-dark { background: var(--accent); color: var(--on-accent); }
-:root[data-theme="fhg"] .hchip.own { color: var(--on-accent); }
-:root[data-theme="fhg"] .ohx-chip.ty[aria-pressed="true"] i, :root[data-theme="fhg"] .ohx-legend .solid { background-color: var(--c-ty); }
+:root[data-theme="fhg"] body { background: radial-gradient(52rem 34rem at 96% -6%, rgba(221, 82, 52, .2), transparent 62%), radial-gradient(40rem 28rem at -6% 110%, rgba(221, 82, 52, .1), transparent 60%), #000; background-attachment: fixed; }
+:root[data-theme="fhg"] .shell { background: radial-gradient(60% 50% at 96% 0%, rgba(221, 82, 52, .12), transparent 62%), #000; border-color: rgba(221, 82, 52, .45); }
+:root[data-theme="fhg"] .sidebar { border-right-color: rgba(221, 82, 52, .28); }
+:root[data-theme="fhg"] .welcome { background: radial-gradient(46rem 28rem at 50% 12%, rgba(221, 82, 52, .3), transparent 65%), #000; }
+
+/* Headlines: condensed, bold, upper-case Latin — like the FHG network graphic */
+:root[data-theme="fhg"] .page-head h1, :root[data-theme="fhg"] .hero h1, :root[data-theme="fhg"] .doc-head h2, :root[data-theme="fhg"] .welcome-tag, :root[data-theme="fhg"] .dlg-head h2 {
+  font-family: var(--font-head); font-weight: 600; text-transform: uppercase; letter-spacing: .015em; }
+:root[data-theme="fhg"] .hero h1 { font-weight: 700; line-height: .98; letter-spacing: .01em; }
+:root[data-theme="fhg"] .hero h1 em { font-style: normal; color: var(--accent); }
+:root[data-theme="fhg"] .hero-sub { color: var(--ink-2); }
+:root[data-theme="fhg"] .hero-orb { right: -27%; width: min(760px, 62%); }
+:root[data-theme="fhg"] .page-head h1 { font-size: 40px; }
+:root[data-theme="fhg"] .page-head h1::after { content: ""; display: block; width: 44px; height: 4px; margin-top: 8px; border-radius: 2px; background: var(--accent); }
+:root[data-theme="fhg"] .panel h2, :root[data-theme="fhg"] .card h2, :root[data-theme="fhg"] .folder-sec, :root[data-theme="fhg"] .set-h { display: flex; align-items: center; gap: 10px; }
+:root[data-theme="fhg"] .panel h2::before, :root[data-theme="fhg"] .card h2::before, :root[data-theme="fhg"] .folder-sec::before, :root[data-theme="fhg"] .set-h::before { content: ""; width: 4px; height: 1em; border-radius: 2px; background: var(--accent); flex: none; }
+
+/* Numbers and labels */
+:root[data-theme="fhg"] .kpi-value { color: var(--accent); font-weight: 700; font-size: 30px; }
+:root[data-theme="fhg"] .kpi-value.good { color: var(--good); }
+:root[data-theme="fhg"] .kpi-value.bad { color: var(--bad); }
+:root[data-theme="fhg"] .kpi { border-top: 3px solid var(--accent); }
+:root[data-theme="fhg"] .kpi-label { color: var(--muted); letter-spacing: .04em; }
+:root[data-theme="fhg"] .ohx-table td:nth-child(3) { color: var(--accent); }
+:root[data-theme="fhg"] .ohx-table td.good, :root[data-theme="fhg"] .ohx-table td.bad { color: inherit; }
+:root[data-theme="fhg"] .ohx-table td.good { color: var(--good); }
+:root[data-theme="fhg"] .ohx-table td.bad { color: var(--bad); }
+:root[data-theme="fhg"] .ohx-table tbody th { color: var(--ink); }
+:root[data-theme="fhg"] .ohx-title, :root[data-theme="fhg"] .oh-eyebrow { color: var(--accent); }
+:root[data-theme="fhg"] .ohx-table-wrap { background: rgba(221, 82, 52, .1); }
+:root[data-theme="fhg"] .donut-num, :root[data-theme="fhg"] .oh-donut-num { fill: var(--accent); }
+:root[data-theme="fhg"] .badge { color: var(--on-accent); }
+:root[data-theme="fhg"] .see-all, :root[data-theme="fhg"] .link-btn, :root[data-theme="fhg"] .crumbs button, :root[data-theme="fhg"] .link-back { color: var(--accent); }
+:root[data-theme="fhg"] .tile-title { color: var(--ink); }
+:root[data-theme="fhg"] .accent { color: var(--accent); }
+
+/* Selected / active states are filled with the accent */
+:root[data-theme="fhg"] .chip[aria-pressed="true"], :root[data-theme="fhg"] .tag[aria-pressed="true"], :root[data-theme="fhg"] .seg button[aria-pressed="true"],
+:root[data-theme="fhg"] .ohx-tabs button[aria-selected="true"], :root[data-theme="fhg"] .hchip.own { background: var(--accent); border-color: var(--accent); color: var(--on-accent); box-shadow: none; }
+:root[data-theme="fhg"] .tab[aria-selected="true"] { background: transparent; color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); border-radius: 0; }
+:root[data-theme="fhg"] .tabs { background: transparent; border-bottom: 1px solid var(--hair); border-radius: 0; padding: 0; }
+:root[data-theme="fhg"] .seg, :root[data-theme="fhg"] .ohx-tabs { background: var(--sunk); }
+:root[data-theme="fhg"] .nav-link[aria-current="page"] { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); border-radius: 4px 14px 14px 4px; }
+:root[data-theme="fhg"] .nav-link[aria-current="page"] .i { color: var(--accent); }
+:root[data-theme="fhg"] .side-item[aria-current="true"], :root[data-theme="fhg"] .history a[aria-current="true"] { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+:root[data-theme="fhg"] .ohx-chip[aria-pressed="true"] { border-color: var(--accent); }
+:root[data-theme="fhg"] .ohx-legend .solid, :root[data-theme="fhg"] .ohx-legend .dashed { border-top-color: var(--accent); }
+:root[data-theme="fhg"] .btn-primary, :root[data-theme="fhg"] .send, :root[data-theme="fhg"] .btn-dark { background: var(--accent); color: var(--on-accent); box-shadow: 0 8px 24px -10px var(--accent); }
+:root[data-theme="fhg"] .btn-ghost { border-color: var(--accent); color: var(--accent); }
+:root[data-theme="fhg"] .avatar { background: var(--accent); color: var(--on-accent); }
+:root[data-theme="fhg"] .avatar.soft { background: var(--accent); color: var(--on-accent); }
+:root[data-theme="fhg"] .back { border-color: rgba(221, 82, 52, .55); }
+:root[data-theme="fhg"] .back:hover { background: var(--accent); color: var(--on-accent); }
+:root[data-theme="fhg"] .back:hover .i { color: var(--on-accent); }
+
+/* Every icon tile is vermilion; borders and hovers pick it up too */
+:root[data-theme="fhg"] .tone-blue, :root[data-theme="fhg"] .tone-violet, :root[data-theme="fhg"] .tone-mint, :root[data-theme="fhg"] .tone-rose, :root[data-theme="fhg"] .tone-coral,
+:root[data-theme="fhg"] .tile-icon, :root[data-theme="fhg"] .row-icon, :root[data-theme="fhg"] .head-icon { color: var(--accent); background: var(--accent-soft); }
+:root[data-theme="fhg"] .tile, :root[data-theme="fhg"] .card-link, :root[data-theme="fhg"] .panel, :root[data-theme="fhg"] .card, :root[data-theme="fhg"] .kpi, :root[data-theme="fhg"] .row { border: 1px solid rgba(221, 82, 52, .22); }
+:root[data-theme="fhg"] .tile:hover, :root[data-theme="fhg"] .card-link:hover, :root[data-theme="fhg"] .row:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 14px 30px -16px var(--accent); }
+:root[data-theme="fhg"] .tick[aria-pressed="false"], :root[data-theme="fhg"] .switch { border-color: rgba(255, 255, 255, .35); }
+:root[data-theme="fhg"] .field input:focus, :root[data-theme="fhg"] .field select:focus, :root[data-theme="fhg"] .ask:focus-within { border-color: var(--accent); }
+:root[data-theme="fhg"] .progress i, :root[data-theme="fhg"] .share-bar i { background: var(--accent); }
+:root[data-theme="fhg"] .chart .bar { fill: var(--accent); }
+:root[data-theme="fhg"] .chart .line.s1 { stroke: var(--accent); }
+:root[data-theme="fhg"] .chart .line.s2 { stroke: #ffffff; }
+:root[data-theme="fhg"] .sw.s1 { background: var(--accent); }
+:root[data-theme="fhg"] .sw.s2 { background: #ffffff; }
+:root[data-theme="fhg"] .orbit { border: 1px solid rgba(221, 82, 52, .45); }
+:root[data-theme="fhg"] .dlg { border: 1px solid rgba(221, 82, 52, .4); }
+:root[data-theme="fhg"] .dlg-tab[aria-selected="true"] { color: var(--accent); }
+:root[data-theme="fhg"] ::selection { background: var(--accent); color: var(--on-accent); }
+
 /* The blue ORCA glass is turned toward the brand colour in FHG mode */
 :root[data-theme="fhg"] .hero-orb, :root[data-theme="fhg"] .brand-mark, :root[data-theme="fhg"] .welcome-mark, :root[data-theme="fhg"] .orbit-mark,
-:root[data-theme="fhg"] .orca-loader, :root[data-theme="fhg"] .msg-bot > img { filter: hue-rotate(158deg) saturate(1.15); }
+:root[data-theme="fhg"] .orca-loader, :root[data-theme="fhg"] .msg-bot > img { filter: hue-rotate(158deg) saturate(1.5); }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; }

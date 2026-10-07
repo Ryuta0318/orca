@@ -169,7 +169,7 @@
     var lib = ["bc", "manual", "rm", "weekly"].map(O.feature);
     return '<section class="hero">' +
       '<img class="hero-orb" src="' + ORB + '" alt="" width="820" height="820">' +
-      "<h1>All<br>connects here.</h1>" +
+      "<h1>All<br><em>connects here.</em></h1>" +
       '<p class="hero-sub">つながる。ひろがる。動き出す。</p>' +
       askBar("homeAsk", "何でも聞いてください…") +
       '<div class="quick">' + O.homeTiles().map(function (id) {
