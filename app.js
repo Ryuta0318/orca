@@ -248,13 +248,7 @@
     badge.toggleAttribute("data-wide", n > 9);
     btn.classList.toggle("has-unread", n > 0);
     btn.setAttribute("aria-label", n ? "お知らせ " + n + "件（未読）" : "お知らせ");
-    if (n > lastNotifCount) {                       // swing the bell once when something new arrives (and on first load)
-      btn.classList.remove("ring"); void btn.offsetWidth; btn.classList.add("ring");
-      setTimeout(function () { btn.classList.remove("ring"); }, 1400);
-    }
-    lastNotifCount = n;
   }
-  var lastNotifCount = -1;
 
   // ---------- Router ----------
   function route() {

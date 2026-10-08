@@ -279,8 +279,10 @@ img { max-width: 100%; }
 .notif-btn:not(.has-unread):hover { color: var(--ink); background: var(--row); }
 .notif-btn .count { position: absolute; top: -6px; right: -6px; min-width: 21px; height: 21px; padding: 0 6px; display: grid; place-items: center; border-radius: 11px; background: var(--ink); color: var(--frame-1); font: 700 12px/1 var(--font-display); font-variant-numeric: tabular-nums; box-shadow: 0 0 0 2.5px var(--accent); }
 .notif-btn .count[data-wide] { right: -14px; }
-.notif-btn.ring .i { animation: bell-swing 1.2s ease-out 1; }
-@keyframes bell-swing { 0%, 100% { transform: rotate(0); } 12% { transform: rotate(16deg); } 28% { transform: rotate(-14deg); } 44% { transform: rotate(10deg); } 60% { transform: rotate(-7deg); } 76% { transform: rotate(3deg); } }
+/* While something is unread the bell swings for ~1s, then rests ~1s, and repeats (every 2s). It stays still while the list is open. */
+.notif-btn.has-unread .i { animation: bell-swing 2s ease-in-out infinite; }
+.notif-btn[aria-expanded="true"] .i { animation: none; }
+@keyframes bell-swing { 0%, 46%, 100% { transform: rotate(0); } 6% { transform: rotate(18deg); } 14% { transform: rotate(-16deg); } 22% { transform: rotate(11deg); } 30% { transform: rotate(-7deg); } 38% { transform: rotate(3deg); } }
 .only-mobile { display: none !important; }
 
 .view { flex: 1; padding: 0 40px 40px; outline: none; }
