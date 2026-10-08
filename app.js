@@ -240,9 +240,21 @@
     var night = store.get("night2", []).filter(function (t) { return t.status === "done"; }).slice(0, 3);
     var items = todos.map(function (t) { return '<a class="notif" href="#todo">' + icon("todo") + "<span><strong>期限のタスク</strong>" + esc(t.text) + "</span></a>"; })
       .concat(night.map(function (t) { return '<a class="notif" href="#night">' + icon("moon") + "<span><strong>夜タスクが完了</strong>" + esc(t.title) + "</span></a>"; }));
-    pop.innerHTML = '<p class="pop-head">お知らせ</p>' + (items.join("") || '<p class="empty">新しいお知らせはありません。</p>');
-    document.getElementById("notifDot").hidden = !items.length;
+    var n = items.length;
+    pop.innerHTML = '<p class="pop-head">お知らせ' + (n ? "（" + n + "件）" : "") + "</p>" + (items.join("") || '<p class="empty">新しいお知らせはありません。</p>');
+    // Unread: the bell is filled with the accent and shows a count; with none it stays quiet
+    var btn = document.getElementById("notifBtn"), badge = document.getElementById("notifCount");
+    badge.hidden = !n; badge.textContent = n > 99 ? "99+" : String(n);
+    badge.toggleAttribute("data-wide", n > 9);
+    btn.classList.toggle("has-unread", n > 0);
+    btn.setAttribute("aria-label", n ? "お知らせ " + n + "件（未読）" : "お知らせ");
+    if (n > lastNotifCount) {                       // swing the bell once when something new arrives (and on first load)
+      btn.classList.remove("ring"); void btn.offsetWidth; btn.classList.add("ring");
+      setTimeout(function () { btn.classList.remove("ring"); }, 1400);
+    }
+    lastNotifCount = n;
   }
+  var lastNotifCount = -1;
 
   // ---------- Router ----------
   function route() {
@@ -306,6 +318,7 @@
   document.getElementById("notifBtn").addEventListener("click", function (e) {
     e.stopPropagation();
     pop.hidden = !pop.hidden;
+    this.setAttribute("aria-expanded", String(!pop.hidden));
   });
   document.addEventListener("click", function (e) { if (!pop.hidden && !pop.contains(e.target)) pop.hidden = true; });
 

@@ -57,7 +57,7 @@
     --page: #090e18; --frame-1: #111a2b; --frame-2: #0e1626; --frame-3: #101b31; --frame-edge: rgba(255, 255, 255, .06);
     --sidebar: rgba(255, 255, 255, .03); --glass: rgba(30, 41, 64, .6); --card: rgba(26, 36, 57, .78); --row: rgba(34, 46, 71, .9); --sunk: #1d2840;
     --ink: #f3f6fc; --ink-2: #ccd4e3; --muted: #9ba6bb; --hair: rgba(255, 255, 255, .07);
-    --accent: #6aa5ff; --accent-2: #9ac3ff; --accent-soft: rgba(106, 165, 255, .15);
+    --accent: #6aa5ff; --accent-2: #9ac3ff; --accent-soft: rgba(106, 165, 255, .15); --on-accent: #0b1220;
     --violet: #9da2ff; --violet-soft: rgba(157, 162, 255, .14); --mint: #5fd1a0; --mint-soft: rgba(95, 209, 160, .13); --coral: #ff9a6b; --coral-soft: rgba(255, 154, 107, .14); --rose: #ff8aab; --rose-soft: rgba(255, 138, 171, .14); --good: #5fd1a0; --good-soft: rgba(95, 209, 160, .14); --bad: #ff7b7b; --bad-soft: rgba(255, 123, 123, .14); --warn: #f0c060; --warn-soft: rgba(240, 192, 96, .14);
     --night: #070b14; --night-2: #141d30;
     --shadow-soft: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -14px rgba(0, 0, 0, .6);
@@ -69,7 +69,7 @@
   --page: #090e18; --frame-1: #111a2b; --frame-2: #0e1626; --frame-3: #101b31; --frame-edge: rgba(255, 255, 255, .06);
   --sidebar: rgba(255, 255, 255, .03); --glass: rgba(30, 41, 64, .6); --card: rgba(26, 36, 57, .78); --row: rgba(34, 46, 71, .9); --sunk: #1d2840;
   --ink: #eef2fa; --ink-2: #c2cada; --muted: #8a94a9; --hair: rgba(255, 255, 255, .07);
-  --accent: #6aa5ff; --accent-2: #9ac3ff; --accent-soft: rgba(106, 165, 255, .15);
+  --accent: #6aa5ff; --accent-2: #9ac3ff; --accent-soft: rgba(106, 165, 255, .15); --on-accent: #0b1220;
   --violet: #9da2ff; --violet-soft: rgba(157, 162, 255, .14); --mint: #5fd1a0; --mint-soft: rgba(95, 209, 160, .13); --coral: #ff9a6b; --coral-soft: rgba(255, 154, 107, .14); --rose: #ff8aab; --rose-soft: rgba(255, 138, 171, .14); --good: #5fd1a0; --good-soft: rgba(95, 209, 160, .14); --bad: #ff7b7b; --bad-soft: rgba(255, 123, 123, .14); --warn: #f0c060; --warn-soft: rgba(240, 192, 96, .14);
   --night: #070b14; --night-2: #141d30;
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -14px rgba(0, 0, 0, .6);
@@ -271,6 +271,16 @@ img { max-width: 100%; }
 .icon-btn .i { width: 16px; height: 16px; }
 .icon-btn:hover { color: var(--ink); }
 .icon-btn .dot { position: absolute; top: 6px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+/* Notification bell: opaque and larger so it never melts into the hero; filled with the accent while there is something unread */
+.icon-btn.notif-btn { width: 42px; height: 42px; background: var(--frame-1); color: var(--ink); border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: 0 2px 10px rgba(0, 0, 0, .16); transition: background .2s, color .2s, box-shadow .2s; }
+.notif-btn .i { width: 22px; height: 22px; stroke-width: 2.1; transform-origin: 50% 8%; }
+.notif-btn.has-unread { background: var(--accent); color: var(--on-accent); border-color: transparent; box-shadow: 0 8px 22px -6px var(--accent), 0 2px 8px rgba(0, 0, 0, .18); }
+.notif-btn:hover { filter: brightness(1.06); color: inherit; }
+.notif-btn:not(.has-unread):hover { color: var(--ink); background: var(--row); }
+.notif-btn .count { position: absolute; top: -6px; right: -6px; min-width: 21px; height: 21px; padding: 0 6px; display: grid; place-items: center; border-radius: 11px; background: var(--ink); color: var(--frame-1); font: 700 12px/1 var(--font-display); font-variant-numeric: tabular-nums; box-shadow: 0 0 0 2.5px var(--accent); }
+.notif-btn .count[data-wide] { right: -14px; }
+.notif-btn.ring .i { animation: bell-swing 1.2s ease-out 1; }
+@keyframes bell-swing { 0%, 100% { transform: rotate(0); } 12% { transform: rotate(16deg); } 28% { transform: rotate(-14deg); } 44% { transform: rotate(10deg); } 60% { transform: rotate(-7deg); } 76% { transform: rotate(3deg); } }
 .only-mobile { display: none !important; }
 
 .view { flex: 1; padding: 0 40px 40px; outline: none; }
@@ -1139,6 +1149,8 @@ td.bad-cell { background: var(--bad-soft); color: var(--bad); font-weight: 700; 
   .shell.open .scrim { opacity: 1; pointer-events: auto; }
   .topbar { position: sticky; padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px; background: color-mix(in srgb, var(--frame-1) 80%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
   .icon-btn { border: 0; background: transparent; }
+  .topbar .icon-btn.notif-btn { border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); background: var(--frame-1); }
+  .topbar .icon-btn.notif-btn.has-unread { background: var(--accent); border-color: transparent; }
   .icon-btn .i { width: 20px; height: 20px; }
   .top-wordmark { position: absolute; left: 50%; transform: translateX(-50%); width: 64px; color: var(--ink); display: inline-block !important; }
   .view { padding: 0 16px 32px; }
